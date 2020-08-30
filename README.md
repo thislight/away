@@ -29,3 +29,7 @@ GNU Gerneral Public License, version 3 or later.
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 > Note on GPLv3: although you have copied code from this project, you don't need to open source if you don't convey it (see GPLv3 for definition of "convey"). This is not a legal advice.
+
+## Special
+
+[Earlier Version of This Project](https://gist.github.com/thislight/220ce18f2e7f303c0b08e1e9c6f3c8ae)
