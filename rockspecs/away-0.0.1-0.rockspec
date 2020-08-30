@@ -1,5 +1,5 @@
 package = "away"
-version = "0.0.1"
+version = "0.0.1-0"
 source = {
    url = "git+https://github.com/thislight/away.git",
    tag = "v0.0.1"
