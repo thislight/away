@@ -3,7 +3,21 @@ local scheduler = away.scheduler
 local microtask_serv_ref = scheduler:install(away.microtask_service)
 local schedule_microtask = microtask_serv_ref:make_schedule_function()
 
+local function topstring(t)
+    if type(t) == 'table' then
+        local buffer =  {}
+        for k,v in ipairs(t) do
+            table.insert(buffer, string.format("%s=%s", topstring(k), topstring(v)))
+        end
+        return '{'..table.concat(buffer, ',')..'}'
+    else
+        return tostring(t)
+    end
+end
+
 local co = coroutine
+
+scheduler:add_watcher('push_signal', function(_, signal) print('signal', topstring(signal)) end)
 
 local the_thread = co.create(function(signal)
     print("called")
