@@ -21,7 +21,11 @@ local scheduler = {
     signal_queue = {},
     auto_signals = {},
     current_thread = nil,
-    stop_flag = false
+    stop_flag = false,
+    watchers = {
+        run_thread = function(scheduler, thread, signal) end,
+        push_signal = function(scheduler, signal) end,
+    }
 }
 
 local function table_deep_copy(t1, t2)
@@ -42,6 +46,7 @@ function scheduler:push_signal(signal, source_thread)
     if not signal.source_thread then
         signal.source_thread = source_thread
     end
+    self.watchers.push_signal(self, signal)
     table.insert(self.signal_queue, signal)
 end
 
@@ -57,6 +62,7 @@ end
 
 function scheduler:run_thread(thread, signal)
     self.current_thread = thread
+    self.watchers.run_thread(self, thread, signal)
     local stat, new_signal = co.resume(thread, signal)
     if stat then
         if new_signal then self:push_signal(new_signal, thread) end
@@ -101,6 +107,14 @@ end
 function scheduler:run_task(taskf)
     local th = co.create(taskf)
     self:run_thread(th)
+end
+
+function scheduler:add_watcher(name, watcher)
+    local prev_watcher = self.watchers[name]
+    self.watchers[name] = function(...)
+        prev_watcher(...)
+        watcher(...)
+    end
 end
 
 local function wait_signal_for(sig, matchfunc)
