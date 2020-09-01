@@ -41,13 +41,18 @@ end
 
 function scheduler:clone_to(new_t) return table_deep_copy(self, new_t) end
 
-function scheduler:push_signal(signal, source_thread)
+function scheduler:push_signal(signal, source_thread, index)
     assert(signal.target_thread ~= nil, "signal must have field 'target_thread'")
     if not signal.source_thread then
         signal.source_thread = source_thread
     end
     self.watchers.push_signal(self, signal)
-    table.insert(self.signal_queue, signal)
+    index = index or (#self.signal_queue + 1)
+    table.insert(self.signal_queue, index, signal)
+end
+
+function scheduler:push_signal_to_first(signal, source_thread)
+    self:push_signal(signal, source_thread, 1)
 end
 
 function scheduler:pop_signal() return table.remove(self.signal_queue, 1) end
@@ -65,7 +70,19 @@ function scheduler:run_thread(thread, signal)
     self.watchers.run_thread(self, thread, signal)
     local stat, new_signal = co.resume(thread, signal)
     if stat then
-        if new_signal then self:push_signal(new_signal, thread) end
+        if new_signal then
+            if new_signal.away_call then
+                local call = new_signal.away_call
+                if call == 'current_thread' then
+                    self:push_signal_to_first {
+                        target_thread = thread,
+                        current_thread = thread,
+                    }
+                end
+            else
+                self:push_signal(new_signal, thread)
+            end
+        end
     else
         if debug then
             local traceback = debug.traceback(thread, new_signal)
@@ -85,7 +102,9 @@ function scheduler:run_step()
         self:run_thread(signal.target_thread, signal)
     end
     for _, sig_gen in ipairs(self.auto_signals) do
-        self:push_signal(sig_gen())
+        local sig = sig_gen()
+        sig.is_auto_signal = true
+        self:push_signal(sig)
     end
 end
 
@@ -106,7 +125,9 @@ end
 
 function scheduler:run_task(taskf)
     local th = co.create(taskf)
-    self:run_thread(th)
+    self:push_signal {
+        target_thread = th
+    }
 end
 
 function scheduler:add_watcher(name, watcher)
@@ -137,6 +158,13 @@ local function wait_signal_like(sig, pattern, strict)
         end
         return true
     end)
+end
+
+local function get_current_thread()
+    local sig = co.yield({
+        away_call = 'current_thread'
+    })
+    return sig.current_thread
 end
 
 local microtask_service = {}
@@ -188,5 +216,6 @@ return {
     scheduler = scheduler,
     wait_signal_for = wait_signal_for,
     wait_signal_like = wait_signal_like,
-    microtask_service = microtask_service
+    microtask_service = microtask_service,
+    get_current_thread = get_current_thread,
 }
