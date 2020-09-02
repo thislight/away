@@ -25,6 +25,7 @@ local scheduler = {
     watchers = {
         run_thread = function(scheduler, thread, signal) end,
         push_signal = function(scheduler, signal) end,
+        before_run_step = function(scheduler, signal_queue) end
     }
 }
 
@@ -98,6 +99,7 @@ function scheduler:run_step()
     local queue = {}
     table.move(self.signal_queue, 1, #self.signal_queue, 1, queue)
     self.signal_queue = {}
+    self.watchers.before_run_step(self, queue)
     for i, signal in ipairs(queue) do
         self:run_thread(signal.target_thread, signal)
     end
