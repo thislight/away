@@ -16,5 +16,6 @@ build = {
    type = "builtin",
    modules = {
       away = "away.lua",
+      ['away.debugger'] = "away/debugger/init.lua"
    }
 }
