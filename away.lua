@@ -66,6 +66,25 @@ function scheduler:set_auto_signal(f)
     table.insert(self.auto_signals, f)
 end
 
+local function handle_away_call(scheduler, thread, signal)
+    local call = signal.away_call
+    if call == 'current_thread' then
+        scheduler:push_signal_to_first({
+            target_thread = thread,
+            current_thread = thread,
+        }, thread)
+    elseif call == 'schedule_thread' then
+        local target_thread = signal.target_thread
+        scheduler:push_signal({
+            target_thread = target_thread,
+            current_thread = thread,
+        }, thread)
+        scheduler:push_signal_to_first({
+            target_thread = thread,
+        }, thread)
+    end
+end
+
 function scheduler:run_thread(thread, signal)
     self.current_thread = thread
     self.watchers.run_thread(self, thread, signal)
@@ -73,13 +92,7 @@ function scheduler:run_thread(thread, signal)
     if stat then
         if new_signal then
             if new_signal.away_call then
-                local call = new_signal.away_call
-                if call == 'current_thread' then
-                    self:push_signal_to_first {
-                        target_thread = thread,
-                        current_thread = thread,
-                    }
-                end
+                handle_away_call(self, thread, new_signal)
             else
                 self:push_signal(new_signal, thread)
             end
@@ -169,6 +182,13 @@ local function get_current_thread()
     return sig.current_thread
 end
 
+local function schedule_thread(thread)
+    co.yield({
+        away_call = 'schedule_thread',
+        target_thread = thread,
+    })
+end
+
 local microtask_service = {}
 
 function microtask_service:clone_to(new_t) return table_deep_copy(self, new_t) end
@@ -220,4 +240,5 @@ return {
     wait_signal_like = wait_signal_like,
     microtask_service = microtask_service,
     get_current_thread = get_current_thread,
+    schedule_thread = schedule_thread,
 }
