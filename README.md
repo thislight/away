@@ -5,7 +5,7 @@ Known supported version:
 - Lua 5.3
 
 ## Drivers
-Uses away with any others asynchronous-programming library.
+Use away with any other asynchronous-programming library.
 
 - [away-luv](https://github.com/thislight/away-luv)
 
