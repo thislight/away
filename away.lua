@@ -24,7 +24,7 @@ local scheduler = {
     stop_flag = false,
     watchers = {
         run_thread = function(scheduler, thread, signal) end,
-        push_signal = function(scheduler, signal) end,
+        push_signal = function(scheduler, signal, index) end,
         before_run_step = function(scheduler, signal_queue) end
     }
 }
@@ -47,8 +47,8 @@ function scheduler:push_signal(signal, source_thread, index)
     if not signal.source_thread then
         signal.source_thread = source_thread
     end
-    self.watchers.push_signal(self, signal)
     index = index or (#self.signal_queue + 1)
+    self.watchers.push_signal(self, signal, index)
     table.insert(self.signal_queue, index, signal)
 end
 
