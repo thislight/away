@@ -25,7 +25,8 @@ local scheduler = {
     watchers = {
         run_thread = function(scheduler, thread, signal) end,
         push_signal = function(scheduler, signal, index) end,
-        before_run_step = function(scheduler, signal_queue) end
+        before_run_step = function(scheduler, signal_queue) end,
+        set_auto_signal = function(scheduler, autosig_gen, first_signal) end,
     }
 }
 
@@ -66,6 +67,7 @@ function scheduler:set_auto_signal(f)
     if first_signal then
         self:push_signal(first_signal)
     end
+    self.watchers.set_auto_signal(self, f, first_signal)
     table.insert(self.auto_signals, f)
 end
 
