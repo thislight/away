@@ -62,7 +62,10 @@ function scheduler:install(installer) return installer:install(self) end
 
 function scheduler:set_auto_signal(f)
     assert(type(f) == 'function', 'set_auto_signal must passed a function which return a new signal')
-    self:push_signal(f())
+    local first_signal = f()
+    if first_signal then
+        self:push_signal(first_signal)
+    end
     table.insert(self.auto_signals, f)
 end
 
@@ -118,8 +121,10 @@ function scheduler:run_step()
     end
     for _, sig_gen in ipairs(self.auto_signals) do
         local sig = sig_gen()
-        sig.is_auto_signal = true
-        self:push_signal(sig)
+        if sig then
+            sig.is_auto_signal = true
+            self:push_signal(sig)
+        end
     end
 end
 
