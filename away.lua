@@ -17,6 +17,17 @@
 
 local co = coroutine
 
+local function table_deep_copy(t1, t2)
+    for k, v in pairs(t1) do
+        if type(v) == 'table' then
+            t2[k] = table_deep_copy(v, {})
+        else
+            t2[k] = v
+        end
+    end
+    return t2
+end
+
 local microtask_service = {}
 
 function microtask_service:clone_to(new_t) return table_deep_copy(self, new_t) end
@@ -74,17 +85,6 @@ local scheduler = {
     },
     microtask_thread = co.create(microtask_service.thread_body)
 }
-
-local function table_deep_copy(t1, t2)
-    for k, v in pairs(t1) do
-        if type(v) == 'table' then
-            t2[k] = table_deep_copy(v, {})
-        else
-            t2[k] = v
-        end
-    end
-    return t2
-end
 
 function scheduler:clone_to(new_t)
     table_deep_copy(self, new_t)
