@@ -86,7 +86,7 @@ This function handling of new signal yielded follow the rules:
 If the thread fails, this function thrown a error. Threads must process all acceptable errrors by themselves.
 
 ##### Away Calls
-Away call help program reach some scheduler's feature without reaching the scheduler. *new in 0.0.2*
+Away call help program reach some scheduler's features without reaching the scheduler. *new in 0.0.2*
 
 - current_thread *new in 0.0.2*
 - schedule_thread *new in 0.0.3*
