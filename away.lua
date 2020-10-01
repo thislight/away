@@ -90,6 +90,14 @@ local function handle_away_call(scheduler, thread, signal)
         scheduler:push_signal_to_first({
             target_thread = thread,
         }, thread)
+    elseif call == 'push_signals' then
+        local new_signals = signal.signals
+        if new_signals then
+            for i, v in ipairs(new_signals) do
+                scheduler:push_signal(v)
+            end
+        end
+        scheduler:push_signal_to_first({target_thread = thread}, thread)
     end
 end
 
@@ -205,6 +213,13 @@ local function wakeback_later()
     }
 end
 
+local function push_signals(signals)
+    co.yield {
+        away_call = 'push_signals',
+        signals = signals
+    }
+end
+
 return {
     scheduler = scheduler,
     wait_signal_for = wait_signal_for,
@@ -212,4 +227,5 @@ return {
     get_current_thread = get_current_thread,
     schedule_thread = schedule_thread,
     wakeback_later = wakeback_later,
+    push_signals = push_signals,
 }
