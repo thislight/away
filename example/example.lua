@@ -1,8 +1,6 @@
 local away = require "away"
 local debugger = require "away.debugger"
 local scheduler = away.scheduler
-local microtask_serv_ref = scheduler:install(away.microtask_service)
-local schedule_microtask = microtask_serv_ref:make_schedule_function()
 
 local co = coroutine
 
