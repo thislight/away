@@ -82,8 +82,7 @@ local scheduler = {
         push_signal = function(scheduler, signal, index) end,
         before_run_step = function(scheduler, signal_queue) end,
         set_auto_signal = function(scheduler, autosig_gen, first_signal) end,
-    },
-    microtask_thread = co.create(microtask_service.thread_body)
+    }
 }
 
 function scheduler:clone_to(new_t)
@@ -132,14 +131,6 @@ local function handle_away_call(scheduler, thread, signal)
         scheduler:push_signal({
             target_thread = target_thread,
             current_thread = thread,
-        }, thread)
-        scheduler:push_signal_to_first({
-            target_thread = thread,
-        }, thread)
-    elseif call == 'schedule_microtask' then
-        scheduler:push_signal({
-            target_thread = scheduler.microtask_thread,
-            microtask = signal.microtask,
         }, thread)
         scheduler:push_signal_to_first({
             target_thread = thread,
@@ -253,12 +244,15 @@ local function schedule_thread(thread)
     })
 end
 
-local function schedule_microtask(taskf)
-    -- Don't use any function which will yield from a thread! it may break the executing of the thread to run microtasks
+local function wakeback_later()
     co.yield {
-        away_call = 'schedule_microtask',
-        microtask = taskf,
+        target_thread = get_current_thread()
     }
+end
+
+local function schedule_microtask(taskf)
+    -- deprecated.
+    taskf()
 end
 
 return {
@@ -269,4 +263,5 @@ return {
     get_current_thread = get_current_thread,
     schedule_thread = schedule_thread,
     schedule_microtask = schedule_microtask,
+    wakeback_later = wakeback_later,
 }
