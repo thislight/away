@@ -28,50 +28,6 @@ local function table_deep_copy(t1, t2)
     return t2
 end
 
-local microtask_service = {}
-
-function microtask_service:clone_to(new_t) return table_deep_copy(self, new_t) end
-
-function microtask_service:install(scheduler)
-    local new_mtask_serv = self:clone_to{
-        scheduler = scheduler,
-        thread = self:make_microtask_thread()
-    }
-    return new_mtask_serv
-end
-
-microtask_service.thread_body = function()
-    while true do
-        local signal = co.yield()
-        local stat, err = pcall(signal.microtask)
-        if not stat then
-            if debug and signal.source_thread then
-                local traceback = debug.traceback(signal.source_thread, err)
-                error(traceback)
-            else
-                error(string.format("mircotask error: %s", err))
-            end
-        end
-    end
-end
-
-function microtask_service:make_microtask_thread()
-    local thread = co.create(self.thread_body)
-    return thread
-end
-
-function microtask_service:schedule_microtask(taskf)
-    self.scheduler:push_signal{
-        target_thread = self.thread,
-        microtask = taskf,
-        source_thread = self.scheduler.current_thread
-    }
-end
-
-function microtask_service:make_schedule_function()
-    return function(taskf) self:schedule_microtask(taskf) end
-end
-
 local scheduler = {
     signal_queue = {},
     auto_signals = {},
@@ -87,7 +43,6 @@ local scheduler = {
 
 function scheduler:clone_to(new_t)
     table_deep_copy(self, new_t)
-    new_t.microtask_thread = co.create(microtask_service.thread_body) -- lua state is not thread-safe
     return new_t
 end
 
@@ -250,18 +205,11 @@ local function wakeback_later()
     }
 end
 
-local function schedule_microtask(taskf)
-    -- deprecated.
-    taskf()
-end
-
 return {
     scheduler = scheduler,
     wait_signal_for = wait_signal_for,
     wait_signal_like = wait_signal_like,
-    microtask_service = microtask_service,
     get_current_thread = get_current_thread,
     schedule_thread = schedule_thread,
-    schedule_microtask = schedule_microtask,
     wakeback_later = wakeback_later,
 }
