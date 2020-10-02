@@ -90,38 +90,20 @@ Away call help program reach some scheduler's features without reaching the sche
 
 - current_thread *new in 0.0.2*
 - schedule_thread *new in 0.0.3*
-- schedule_microtask *new in 0.0.3*
+- push_signals *new in 0.0.5*
 
 ###### `current_thread`
 Resume the calling thread as soon as possible by a signal contains itself (`.current_thread`).
 
 ###### `schedule_thread`
 Push a empty signal which run the thread given (the signal `.target_thread`). Resume the calling thread as soon as possible.
+- If the signal have `.mixsignal`, it will be set `target_thread` and used as the signal sent to queue. *new in 0.0.5*
 
-###### `schedule_microtask`
-Use a internal microtask thread to run a function (the signal `.microtask`). Resume the calling thread as soon as possible.
+###### `push_signals`
+Push signals from the signal `.signals`, wakeback thread as soon as possible.
 
-### Microtask Service
-````lua
-local away = require "away"
-local mtask_serv = away.scheduler:install(away.microtask_service)
-local schedule_microtask = mtask_serv:make_schedule_function()
+#### `scheduler.run(self)`
+Start the scheduler loop. Return only when the signal queue is empty or stop flag set (by `.stop()`).
 
-schdule_microtask(function() print("Hello World") end)
-
-away.scheduler:run()
-````
-
-#### `microtask_service.install(self, scheduler)`
-When you call `scheduler:install` on microtask service, it will call this function and return the result.
-Return a copied `microtask_service`, which is a really usable object.
-
-#### `microtask_service.clone_to(self, new_t)`
-Copy values in `self` to `new_t`.
-Return `new_t`.
-
-#### `microtask_service.schedule_microtask(self, taskf)`
-Schedule the run of `taskf`. The function just push a signal to run the thread of microtask service.
-
-#### `microtask_service.make_schedule_function(self)`
-Return a `function` which with one parameter `taskf` to call `self:schedule_microtask(taskf)`.
+#### `schedule.runforever(self)`
+Run the scheduler loop until stop flag set (by `stop()`).
