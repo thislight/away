@@ -102,8 +102,24 @@ Push a empty signal which run the thread given (the signal `.target_thread`). Re
 ###### `push_signals`
 Push signals from the signal `.signals`, wakeback thread as soon as possible.
 
+
 #### `scheduler.run(self)`
 Start the scheduler loop. Return only when the signal queue is empty or stop flag set (by `.stop()`).
 
-#### `schedule.runforever(self)`
+#### `scheduler.runforever(self)`
 Run the scheduler loop until stop flag set (by `stop()`).
+
+#### `scheduler.cleanup(self)`
+Clean up data store in scheduler to get ready for next clean run.
+
+#### `scheduler.run_step(self)`
+Run one step of scheduler loop.
+
+#### `scheduler.stop(self)`
+Mark the scheduler stop.
+
+#### `scheduler.run_task(self, taskf)`
+Create a thread using `taskf` and schedule the run.
+
+#### `scheduler.add_watcher(self, name, watcher)`
+Set a `watcher` for `name`.
