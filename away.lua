@@ -83,10 +83,9 @@ local function handle_away_call(scheduler, thread, signal)
         }, thread)
     elseif call == 'schedule_thread' then
         local target_thread = signal.target_thread
-        scheduler:push_signal({
-            target_thread = target_thread,
-            current_thread = thread,
-        }, thread)
+        local new_thread_sig = signal.mixsignal or {}
+        new_thread_sig.target_thread = target_thread
+        scheduler:push_signal(new_thread_sig, thread)
         scheduler:push_signal_to_first({
             target_thread = thread,
         }, thread)
@@ -200,10 +199,11 @@ local function get_current_thread()
     return sig.current_thread
 end
 
-local function schedule_thread(thread)
+local function schedule_thread(thread, mixsignal)
     co.yield({
         away_call = 'schedule_thread',
         target_thread = thread,
+        mixsignal = mixsignal,
     })
 end
 
