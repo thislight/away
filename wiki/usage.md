@@ -119,7 +119,7 @@ Mark the scheduler stop.
 Create a thread using `taskf` and schedule the run.
 
 #### `scheduler.add_watcher(self, name, watcher)`
-Set a `watcher` for `name`.
+Set a `watcher` for `name`. Return `watcher`.
 
 ##### Watchers
 - run_thread(scheduler, thread, signal)
@@ -177,7 +177,7 @@ Create a fireline. Return a table which can be called directly.
 Return a copy of `fl`.
 
 #### `fireline.append(fl, value)`
-Insert `value` at the last of `fl`. It is a alias of `table.insert(fl, value)`.
+Insert `value` at the last of `fl`. It is a alias of `table.insert(fl, value)`. Return `value`.
 
 #### `fireline.remove_by_value(fl, value)`
 Remove `value` from `fl`. Return a number for the original index, or nil for value not found.

@@ -50,6 +50,7 @@ end
 
 function fireline.append(fl, val)
     table.insert(fl, val)
+    return val
 end
 
 function fireline.remove_by_value(fl, value)
@@ -205,7 +206,7 @@ end
 function scheduler:add_watcher(name, watcher)
     local target_fireline = self.watchers[name]
     assert(target_fireline, "the targeted watcher name must exists")
-    table.insert(target_fireline, watcher)
+    return fireline.append(target_fireline, watcher)
 end
 
 local function wait_signal_for(sig, matchfunc)
