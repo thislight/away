@@ -28,21 +28,61 @@ local function table_deep_copy(t1, t2)
     return t2
 end
 
+local fireline = {}
+
+function fireline.create()
+    local new_t = {}
+    setmetatable(new_t, {
+        __call = function(self, ...)
+            for _, f in ipairs(new_t) do
+                f(...)
+            end
+        end
+    })
+    return new_t
+end
+
+function fireline.copy(fl)
+    local new_fl = fireline.create()
+    table.move(fl, 1, #fl, 1, new_fl)
+    return new_fl
+end
+
+function fireline.append(fl, val)
+    table.insert(fl, val)
+end
+
+function fireline.remove_by_value(fl, value)
+    local index
+    for i, v in ipairs(fl) do
+        if value == v then
+            index = i
+        end
+    end
+    if index then
+        table.remove(fl, index)
+    end
+    return index
+end
+
 local scheduler = {
     signal_queue = {},
     auto_signals = {},
     current_thread = nil,
     stop_flag = false,
     watchers = {
-        run_thread = function(scheduler, thread, signal) end,
-        push_signal = function(scheduler, signal, index) end,
-        before_run_step = function(scheduler, signal_queue) end,
-        set_auto_signal = function(scheduler, autosig_gen, first_signal) end,
+        run_thread = fireline.create(), -- function(scheduler, thread, signal) end
+        push_signal = fireline.create(),-- function(scheduler, signal, index) end
+        before_run_step = fireline.create(),-- function(scheduler, signal_queue) end
+        set_auto_signal = fireline.create(),-- function(scheduler, autosig_gen, first_signal) end
     }
 }
 
 function scheduler:clone_to(new_t)
     table_deep_copy(self, new_t)
+    for k, v in pairs(new_t.watchers) do
+        new_t[k] = fireline.copy(v)
+    end
     return new_t
 end
 
@@ -163,11 +203,9 @@ function scheduler:run_task(taskf)
 end
 
 function scheduler:add_watcher(name, watcher)
-    local prev_watcher = self.watchers[name]
-    self.watchers[name] = function(...)
-        prev_watcher(...)
-        watcher(...)
-    end
+    local target_fireline = self.watchers[name]
+    assert(target_fireline, "the targeted watcher name must exists")
+    table.insert(target_fireline, watcher)
 end
 
 local function wait_signal_for(sig, matchfunc)
@@ -228,4 +266,5 @@ return {
     schedule_thread = schedule_thread,
     wakeback_later = wakeback_later,
     push_signals = push_signals,
+    fireline = fireline,
 }
