@@ -43,9 +43,6 @@ scheduler:run()
 
 ## API
 ### Scheduler
-TODO: write document  
-You can look at source for now, it's super easy.
-
 #### `scheduler.clone_to(self, new_t)`
 Copy key-value pairs from `self` to `new_t`.
 Return `new_t`.
