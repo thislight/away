@@ -9,7 +9,7 @@ This library is still in early stage, which means APIs may be changed across ver
 Please keep an eye on change log and version number. The changes only on `-x` means no API changes, such as `0.0.3-0` and `0.0.3-1`.
 
 Current versions:
-- Developing: 0.0.4
+- Developing: 0.0.5
 - RR(Release-Ready): None
 - Stable: None
 
