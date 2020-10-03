@@ -4,7 +4,7 @@ local scheduler = away.scheduler
 
 local co = coroutine
 
-scheduler:add_watcher('push_signal', function(_, signal) print('signal', debugger.topstring(debugger:pretty_signal(signal))) end)
+debugger:set_default_watchers(scheduler)
 
 local the_thread = co.create(function(signal)
     print("called")

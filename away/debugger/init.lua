@@ -1,3 +1,4 @@
+local fireline = require("away").fireline
 
 local debugger = {
     recent_threads = {},
@@ -64,6 +65,31 @@ function debugger:pretty_signal(sig)
         end
     end
     return copy
+end
+
+function debugger:pretty_signal_queue(queue)
+    local copy = {}
+    local insert = table.insert
+    for _, v in ipairs(queue) do
+        insert(copy, self:pretty_signal(v))
+    end
+    return copy
+end
+
+function debugger:set_default_watchers(scheduler, out)
+    out = out or print
+    return {
+        push_signal = scheduler:add_watcher('push_signal', function(_, signal, index) out("push_signal", index, self.topstring(self:pretty_signal(signal))) end),
+        run_thread = scheduler:add_watcher('run_thread', function(_, thread, signal) out("run_thread", self:remap_thread(thread), self.topstring(self:pretty_signal(signal))) end),
+        before_run_step = scheduler:add_watcher('before_run_step', function(_, signal_queue) out("before_run_step", self.topstring(self:pretty_signal_queue(signal_queue))) end),
+        set_auto_signal = scheduler:add_watcher('set_auto_signal', function(_, autosig_gen, fst_sig) out("set_auto_signal", autosig_gen, self.topstring(self:pretty_signal(fst_sig))) end),
+    }
+end
+
+function debugger:unset_default_watchers(scheduler, d)
+    for k, v in pairs(d) do
+        fireline.remove_by_value(scheduler.watchers[k], v)
+    end
 end
 
 return debugger
