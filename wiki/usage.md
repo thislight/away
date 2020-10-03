@@ -135,3 +135,17 @@ Away call to schedule the run of `thread` as `schedule_thread`.
 #### `push_signals(t)`
 *new in 0.0.5*  
 Away call to push any signals to signal queue as `push_signals`.
+
+#### `wait_signal_for(sig, matchfunc)`
+Yield `sig` and wait for a `signal` let `matchfunc(signal)` return truthy value. Return the signal.  
+The `sig` only is yielded once.
+
+#### `wait_signal_like(sig, pattern, strict)`
+Yield `sig` and wait for a signal matchs `pattern`. `pattern` is a table which will be compared to received signals by key-value pairs. If `strict` is `false`, a function value in `pattern` will be deal as a matcher (a function accept one parameter for the value of the signal), the comparing result of the key-value pair is the result of the function call result; otherwise, every key-value pair will be compared by equal operator (`==`).  
+This function will hold (the thread will be yielded) until every key-value pairs in pattern are equal to received signal. Return the signal.  
+The `sig` only is yielded once.
+````lua
+wait_signal_like(nil, {
+    kind = "dataqueue_wakeback"
+})
+````
