@@ -20,6 +20,20 @@ local function topstring(t)
     end
 end
 
+function debugger:create(t)
+    t = t or {}
+    for k, v in pairs(self) do
+        t[k] = v
+    end
+    t.recent_threads = {}
+    t.max_tid = 0
+end
+
+function debugger:cleanup()
+    self.recent_threads = {}
+    self.max_tid = 0
+end
+
 debugger.topstring = topstring
 
 function debugger:remap_thread(thread)
