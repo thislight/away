@@ -121,6 +121,12 @@ Create a thread using `taskf` and schedule the run.
 #### `scheduler.add_watcher(self, name, watcher)`
 Set a `watcher` for `name`.
 
+##### Watchers
+- run_thread(scheduler, thread, signal)
+- push_signal(scheduler, signal, index)
+- before_run_step(scheduler, signal_queue)
+- set_auto_signal(scheduler, autosig_gen, first_signal)
+
 
 ### Helpers
 #### `get_current_thread()`
