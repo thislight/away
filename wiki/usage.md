@@ -149,3 +149,29 @@ wait_signal_like(nil, {
     kind = "dataqueue_wakeback"
 })
 ````
+
+### Fireline
+Fireline is a small helper library to deal with watcher. It provides a callable table can call all functions in it directly.
+````lua
+local fireline = require("away").fireline
+local fl = fireline.create()
+local function spam(name)
+    print("Hello, "..name)
+end
+fireline.append(fl, spam)
+fireline.append(fl, spam)
+fireline.append(fl, spam)
+fl("World")
+````
+
+#### `fireline.create()`
+Create a fireline. Return a table which can be called directly.
+
+#### `fireline.copy(fl)`
+Return a copy of `fl`.
+
+#### `fireline.append(fl, value)`
+Insert `value` at the last of `fl`. It is a alias of `table.insert(fl, value)`.
+
+#### `fireline.remove_by_value(fl, value)`
+Remove `value` from `fl`. Return a number for the original index, or nil for value not found.
