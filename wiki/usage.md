@@ -123,3 +123,18 @@ Create a thread using `taskf` and schedule the run.
 
 #### `scheduler.add_watcher(self, name, watcher)`
 Set a `watcher` for `name`.
+
+
+### Helpers
+#### `get_current_thread()`
+*new in 0.0.2*  
+Away call `get_current_thread`, return the current thread is in.
+
+#### `schedule_thread(thread, mixsignal)`
+*new in 0.0.3*  
+Away call to schedule the run of `thread` as `schedule_thread`.
+- If `mixsignal` is not `nil` or `false`, it will be sent to the thread as the signal (See section "Away Calls"). *new in 0.0.5*
+
+#### `push_signals(t)`
+*new in 0.0.5*  
+Away call to push any signals to signal queue as `push_signals`.
