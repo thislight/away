@@ -181,3 +181,14 @@ Insert `value` at the last of `fl`. It is a alias of `table.insert(fl, value)`. 
 
 #### `fireline.remove_by_value(fl, value)`
 Remove `value` from `fl`. Return a number for the original index, or nil for value not found.
+
+### Debugger
+Debugger contains some helpers to help debugging.
+````lua
+local away = require "away"
+local Debugger = require "away.debugger"
+
+Debugger:set_default_watchers(away.scheduler)
+Debugger:set_target_thread_uniqueness_checker(away.scheduler)
+Debugger:set_signal_uniqueness_checker(away.scheduler)
+````
