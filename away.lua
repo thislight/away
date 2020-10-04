@@ -90,7 +90,7 @@ local scheduler = {
 function scheduler:clone_to(new_t)
     table_deep_copy(self, new_t)
     for k, v in pairs(new_t.watchers) do
-        new_t[k] = fireline.copy(v)
+        new_t.watchers[k] = fireline.copy(v)
     end
     return new_t
 end
