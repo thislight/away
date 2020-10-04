@@ -172,4 +172,19 @@ function debugger:set_timeout(scheduler, timeout, errout, timeprovider)
     return watchers
 end
 
+function debugger:is_next_signal_match(scheduler, pattern, pos)
+    local queue = scheduler.signal_queue
+    pos = pos or 1
+    if pos < 0 then
+        pos = #queue - (pos + 1)
+    end
+    local target_signal = queue[pos]
+    for k, v in pairs(pattern) do
+        if target_signal[k] ~= v then
+            return false
+        end
+    end
+    return true
+end
+
 return debugger
