@@ -71,6 +71,14 @@ local scheduler = {
     auto_signals = {},
     current_thread = nil,
     stop_flag = false,
+    error_handler = function(scheduler, err, thread, signal)
+        if debug then
+            local traceback = debug.traceback(thread, err)
+            error(traceback)
+        else
+            error(string.format("user thread error: %s", err))
+        end
+    end,
     watchers = {
         run_thread = fireline.create(), -- function(scheduler, thread, signal) end
         push_signal = fireline.create(),-- function(scheduler, signal, index) end
@@ -154,12 +162,7 @@ function scheduler:run_thread(thread, signal)
             end
         end
     else
-        if debug then
-            local traceback = debug.traceback(thread, new_signal)
-            error(traceback)
-        else
-            error(string.format("thread error: %s", new_signal))
-        end
+        self:error_handler(new_signal, thread, signal)
     end
     self.current_thread = nil
 end
