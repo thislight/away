@@ -18,6 +18,10 @@ Use away with any other asynchronous-programming library.
 
 - [away-luv](https://github.com/thislight/away-luv)
 
+## Helpers
+
+- [away-dataqueue](https://github.com/thislight/away-dataqueue)
+
 ## Doucments
 - [Designs](wiki/designs.md)
 - [Usage](wiki/usage.md)
