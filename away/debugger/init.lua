@@ -1,4 +1,5 @@
 local fireline = require("away").fireline
+local scheduler = require("away").scheduler
 
 local debugger = {
     recent_threads = {},
@@ -148,6 +149,12 @@ function debugger:set_signal_uniqueness_checker(scheduler, errout)
         end)
     }
     return watchers
+end
+
+function debugger:new_environment(func)
+    local new_scheduler = scheduler:clone_to {}
+    local new_debugger = self:clone()
+    return func(new_scheduler, new_debugger)
 end
 
 return debugger
