@@ -29,6 +29,7 @@ function debugger:create(t)
     end
     t.recent_threads = {}
     t.max_tid = 0
+    return t
 end
 
 function debugger:cleanup()
@@ -153,7 +154,7 @@ end
 
 function debugger:new_environment(func)
     local new_scheduler = scheduler:clone_to {}
-    local new_debugger = self:clone()
+    local new_debugger = self:create()
     return func(new_scheduler, new_debugger)
 end
 
