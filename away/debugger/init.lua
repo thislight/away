@@ -109,4 +109,50 @@ function debugger:unset_watchers(scheduler, d)
     self:unset_default_watchers(scheduler, d)
 end
 
+local function group_by(t, key)
+    local result = {}
+    for i, v in ipairs(t) do
+        if not result[key] then
+            result[key] = {}
+        end
+        table.insert(result[key], v)
+    end
+    return result
+end
+
+function debugger:set_target_thread_uniqueness_checker(scheduler, errout)
+    errout = errout or error
+    local watchers = {
+        before_run_step = scheduler:add_watcher('before_run_step', function(_, signalq)
+            local groups = group_by(signalq, 'target_thread')
+            for th, signals in pairs(groups) do
+                if #signals > 1 then
+                    errout(string.format("targeted thread %d (%s) is not unique in one pass of scheduler loop: %s", self:remap_thread(th), th, self.topstring(self:pretty_signal_queue(signals))), 2)
+                end
+            end
+        end)
+    }
+    return watchers
+end
+
+function debugger:set_signal_uniqueness_checker(scheduler, errout)
+    errout = errout or error
+    local watchers = {
+        before_run_step = scheduler:add_watcher('before_run_step', function(_, signalq)
+            for _, sig in ipairs(signalq) do
+                local count = 0
+                for _, sig2 in ipairs(signalq) do
+                    if sig == sig2 then
+                        count = count + 1
+                    end
+                    if count > 1 then
+                        errout("signal is not unique: "..self.topstring(self:pretty_signal(sig)), 2)
+                    end
+                end
+            end
+        end)
+    }
+    return watchers
+end
+
 return debugger
