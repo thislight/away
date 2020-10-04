@@ -92,4 +92,21 @@ function debugger:unset_default_watchers(scheduler, d)
     end
 end
 
+function debugger:set_thread_jump_recorder(scheduler)
+    local records = {}
+    local watchers = {
+        run_thread = scheduler:add_watcher('run_thread', function(_, thread, signal)
+            table.insert(records, {
+                source = signal.source_thread,
+                target = thread
+            })
+        end)
+    }
+    return records, watchers
+end
+
+function debugger:unset_watchers(scheduler, d)
+    self:unset_default_watchers(scheduler, d)
+end
+
 return debugger
