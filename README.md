@@ -4,6 +4,9 @@ A easy by-signal coroutine scheduler for Lua.
 Known supported version:
 - Lua 5.3
 
+## LuaRocks Page
+[away - LuaRocks](https://luarocks.org/modules/thislight/away)
+
 ## APIs may being changed
 This library is still in early stage, which means APIs may be changed across versions.  
 Please keep an eye on change log and version number. The changes only on `-x` means no API changes, such as `0.0.3-0` and `0.0.3-1`.
@@ -26,6 +29,13 @@ Use away with any other asynchronous-programming library.
 - [Designs](wiki/designs.md)
 - [Usage](wiki/usage.md)
 - [Example](example/)
+
+## Run Tests
+Tests use [busted](http://olivinelabs.com/busted/).
+To run tests, just use the command in project directory:
+````shell
+busted
+````
 
 ## License
 GNU Gerneral Public License, version 3 or later.
