@@ -5,6 +5,8 @@ local scheduler = away.scheduler
 local co = coroutine
 
 debugger:set_default_watchers(scheduler)
+debugger:set_signal_uniqueness_checker(scheduler)
+debugger:set_target_thread_uniqueness_checker(scheduler)
 
 local the_thread = co.create(function(signal)
     print("called")
