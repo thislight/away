@@ -23,6 +23,7 @@ describe("scheduler", function()
 
     it("can jump across threads based on signals", function()
         debugger:new_environment(function(scheduler, debugger)
+            debugger:set_timeout(scheduler, 10)
             local thread_mock = mocks.thread()
             scheduler:run_task(function()
                 return {target_thread = thread_mock.mock}
@@ -36,6 +37,7 @@ describe("scheduler", function()
 
     it("can handle get_current_thread away call", function()
         debugger:new_environment(function(scheduler, debugger)
+            debugger:set_timeout(scheduler, 10)
             local thread2
             local thread = mocks.thread(
                 function()
@@ -52,6 +54,7 @@ describe("scheduler", function()
 
     it("can use auto signal", function()
         debugger:new_environment(function(scheduler, debugger)
+            debugger:set_timeout(scheduler, 10)
             local countdown = 2
             local thread = mocks.thread(
                 function()
