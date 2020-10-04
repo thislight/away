@@ -138,16 +138,11 @@ end
 function debugger:set_signal_uniqueness_checker(scheduler, errout)
     errout = errout or error
     local watchers = {
-        before_run_step = scheduler:add_watcher('before_run_step', function(_, signalq)
+        push_signal = scheduler:add_watcher('push_signal', function(scheduler, signal)
+            local signalq = scheduler.signal_queue
             for _, sig in ipairs(signalq) do
-                local count = 0
-                for _, sig2 in ipairs(signalq) do
-                    if sig == sig2 then
-                        count = count + 1
-                    end
-                    if count > 1 then
-                        errout("signal is not unique: "..self.topstring(self:pretty_signal(sig)), 2)
-                    end
+                if sig == signal then
+                    errout("signal could not inserted twice or more : "..self.topstring(self:pretty_signal(sig)), 2)
                 end
             end
         end)
