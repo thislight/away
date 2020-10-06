@@ -187,4 +187,32 @@ function debugger:is_next_signal_match(scheduler, pattern, pos)
     return true
 end
 
+local ddebug = {}
+debugger.debug = ddebug
+
+local function el_exists(t, el)
+    for _, v in ipairs(t) do
+        if v == el then
+            return true
+        end
+    end
+    return false
+end
+
+function ddebug.sethook(scheduler, hook, mask, count)
+    local threads = {}
+    local watchers = {
+        run_thread = scheduler:set_watcher('run_thread', function(scheduler, thread, signal)
+            if not el_exists(threads, thread) then
+                local function hook_warpper(event, lineno)
+                    hook(event, lineno, scheduler, thread)
+                end
+                debug.sethook(thread, hook_warpper, mask, count)
+                table.insert(threads, thread)
+            end
+        end)
+    }
+    return watchers
+end
+
 return debugger
