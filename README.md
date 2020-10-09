@@ -29,6 +29,7 @@ Use away with any other asynchronous-programming library.
 - [Designs](wiki/designs.md)
 - [Usage](wiki/usage.md)
 - [Example](example/)
+- [Contribution Guide](wiki/contribution.md)
 
 ## Run Tests
 Tests use [busted](http://olivinelabs.com/busted/).
