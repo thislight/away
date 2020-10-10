@@ -13,7 +13,7 @@ Please keep an eye on change log and version number. The changes only on `-x` me
 
 Current versions:
 - Developing: 0.1.0
-- RR(Release-Ready): None
+- RR(Release-Ready): 0.1.0
 - Stable: None
 
 ## Drivers
