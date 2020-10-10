@@ -34,21 +34,46 @@ describe("scheduler", function()
                               thread_mock.called_count)
         end)
     end)
+    describe("away call", function()
+        it("can handle get_current_thread", function()
+            debugger:new_environment(function(scheduler, debugger)
+                debugger:set_timeout(scheduler, 10)
+                local thread2
+                local thread = mocks.thread(
+                                   function()
+                        thread2 = away.get_current_thread()
+                    end)
+                scheduler:push_signal{target_thread = thread.mock}
+                scheduler:run()
+                assert.equals(thread.mock, thread2)
+            end)
+        end)
+        
+        it("can handle schedule_thread", function()
+            debugger:new_environment(function(scheduler, debugger)
+                debugger:set_timeout(scheduler, 10)
+                local thread = mocks.thread()
+                scheduler:run_task(function()
+                    away.schedule_thread(thread.mock)
+                end)
+                scheduler:run()
+                assert.equals(thread.called_count, 1)
+            end)
+        end)
 
-    it("can handle get_current_thread away call", function()
-        debugger:new_environment(function(scheduler, debugger)
-            debugger:set_timeout(scheduler, 10)
-            local thread2
-            local thread = mocks.thread(
-                function()
-                    thread2 = away.get_current_thread()
-                end
-            )
-            scheduler:push_signal {
-                target_thread = thread.mock
-            }
-            scheduler:run()
-            assert.equals(thread.mock, thread2)
+        it("can handle push_signals", function()
+            debugger:new_environment(function(scheduler, debugger)
+                debugger:set_timeout(scheduler, 10)
+                local thread = mocks.thread()
+                scheduler:run_task(function()
+                    away.push_signals({
+                        {target_thread = thread.mock},
+                        {target_thread = thread.mock}
+                    })
+                end)
+                scheduler:run()
+                assert.equals(thread.resume_count, 2)
+            end)
         end)
     end)
 
@@ -56,24 +81,39 @@ describe("scheduler", function()
         debugger:new_environment(function(scheduler, debugger)
             debugger:set_timeout(scheduler, 10)
             local countdown = 2
-            local thread = mocks.thread(
-                function()
-                    while countdown > 0 do
-                        countdown = countdown - 1
-                        co.yield()
-                    end
-                    scheduler:stop()
+            local thread = mocks.thread(function()
+                while countdown > 0 do
+                    countdown = countdown - 1
+                    co.yield()
                 end
-            )
-            scheduler:set_auto_signal(
-                function()
-                    return {
-                        target_thread = thread.mock
-                    }
-                end
-            )
+                scheduler:stop()
+            end)
+            scheduler:set_auto_signal(function()
+                return {target_thread = thread.mock}
+            end)
             scheduler:run()
             assert.equals(0, countdown)
+        end)
+    end)
+end)
+
+describe("wakeback_later()", function()
+    local away = require "away"
+    local debugger = require "away.debugger"
+
+    it("can wakeback thread correctly", function()
+        debugger:new_environment(function(scheduler, debugger)
+            debugger:set_timeout(scheduler, 10)
+            local reach = false
+            local thread = mocks.thread(
+                function()
+                    away.wakeback_later()
+                    reach = true
+                end
+            )
+            scheduler:push_signal {target_thread = thread.mock}
+            scheduler:run()
+            assert.is.True(reach)
         end)
     end)
 end)
