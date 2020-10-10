@@ -32,7 +32,17 @@ local function callable(extra)
 end
 
 local function thread(extra)
-    local info = callable(extra)
+    local info
+    info = callable(function()
+        while true do
+            info.resume_count = info.resume_count + 1
+            if extra then
+                extra()
+            end
+            coroutine.yield()
+        end
+    end)
+    info.resume_count = 0
     local th = coroutine.create(info.mock)
     info.mock = th
     return info
