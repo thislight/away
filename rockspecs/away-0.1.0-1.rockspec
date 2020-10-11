@@ -1,7 +1,8 @@
 package = "away"
-version = "git-0"
+version = "0.1.0-1"
 source = {
    url = "git+https://github.com/thislight/away.git",
+   tag = "v0.1.0-hotfix.0"
 }
 description = {
    summary = "A easy by-signal coroutine scheduler for Lua.",
