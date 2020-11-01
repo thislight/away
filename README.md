@@ -7,8 +7,7 @@ Known supported version:
 ## LuaRocks Page
 [away - LuaRocks](https://luarocks.org/modules/thislight/away)
 
-## APIs may being changed
-Current versions:
+## Current versions
 - Developing: 0.1.1
 - RR(Release-Ready): 0.1.0
 - Stable: None
