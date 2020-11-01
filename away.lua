@@ -308,6 +308,11 @@ local function handle_away_call(scheduler, thread, signal)
             end
         end
         scheduler:push_signal_to_first({target_thread = thread}, thread)
+    elseif call == 'set_timers' then
+        local timers = signal.timers
+        for _, v in ipairs(timers) do
+            scheduler:set_timer(v)
+        end
     end
 end
 
