@@ -66,6 +66,75 @@ function fireline.remove_by_value(fl, value)
     return index
 end
 
+local threadpool = {}
+
+local function threadpool_body(descriptor)
+    while true do
+        descriptor.state = 'waiting'
+        local fn = co.yield()
+        if type(fn) == 'table' then
+            fn = fn.threadpool_callback
+        end
+        if type(fn) == 'function' then
+            descriptor.state = 'running'
+            fn()
+        end
+    end
+end
+
+function threadpool.new()
+    return setmetatable({}, { __index = threadpool })
+end
+
+function threadpool:create_executor()
+    local descriptor = {}
+    local new_thread = co.create(threadpool_body)
+    descriptor.thread = new_thread
+    co.resume(new_thread, descriptor)
+    table.insert(self, descriptor)
+    return descriptor
+end
+
+function threadpool:first_waiting_executor()
+    for i, v in ipairs(self) do
+        if v.state == 'waiting' then
+            return v
+        end
+    end
+end
+
+function threadpool:gc(waiting_limit)
+    waiting_limit = waiting_limit or 4
+    local to_be_remove_indexs = {}
+    for i,v in ipairs(self) do
+        if v.state == 'waiting' then
+            table.insert(to_be_remove_indexs, i)
+        end
+    end
+    if #to_be_remove_indexs > 0 then
+        if #to_be_remove_indexs < waiting_limit then
+            waiting_limit = #to_be_remove_indexs
+        end
+        for i=1, waiting_limit do
+            table.remove(to_be_remove_indexs)
+        end
+        for _, i in ipairs(to_be_remove_indexs) do
+            table.remove(self, i)
+        end
+    end
+end
+
+function threadpool:runfn(fn, resume)
+    resume = resume or co.resume
+    self:gc(self.default_waiting_limit)
+    local waiting_executor = self:first_waiting_executor()
+    if not waiting_executor then
+        waiting_executor = self:create_executor()
+    end
+    waiting_executor.state = 'scheduled'
+    resume(waiting_executor.thread, fn)
+end
+
 local scheduler = {
     signal_queue = {},
     auto_signals = {},
@@ -84,7 +153,13 @@ local scheduler = {
         push_signal = fireline.create(),-- function(scheduler, signal, index) end
         before_run_step = fireline.create(),-- function(scheduler, signal_queue) end
         set_auto_signal = fireline.create(),-- function(scheduler, autosig_gen, first_signal) end
-    }
+    },
+    timed_events = {},
+    timers = {},
+    time = function()
+        return os.time() * 1000
+    end,
+    threadpool = threadpool.new(),
 }
 
 function scheduler:clone_to(new_t)
@@ -93,6 +168,93 @@ function scheduler:clone_to(new_t)
         new_t.watchers[k] = fireline.copy(v)
     end
     return new_t
+end
+
+local function timed_events_find_next_slot(t, event)
+    for index, ev in ipairs(t) do
+        if ev.promised_time < event.promised_time then
+            return index + 1
+        end
+    end
+    return #t + 1
+end
+
+local function timer2event(timer, base_time)
+    if timer.type == 'once' then
+        return {
+            promised_time = base_time + timer.delay,
+            callback = timer.callback,
+            timer = timer,
+        }
+    elseif timer.type == 'repeat' then
+        return {
+            promised_time = base_time + timer.duration,
+            callback = timer.callback,
+            timer = timer,
+        }
+    end
+end
+
+function scheduler:set_timer(options)
+    options.type = options.type or 'once'
+    if options.type == 'once' then
+        assert(options.delay ~= nil)
+        assert(options.callback)
+        local event = timer2event(options, self.time())
+        local index = timed_events_find_next_slot(self.timed_events, event)
+        table.insert(self.timed_events, index, event)
+    elseif options.type == 'repeat' then
+        assert(options.duration ~= nil)
+        assert(options.callback)
+        options.start_time = self.time()
+        options.epoch = 0
+        table.insert(self.timers, options)
+    else
+        error('type must one of "once" and "repeat", got '..options.type)
+    end
+end
+
+function scheduler:run_callback_in_threadpool(callback, source_thread, index)
+    self.threadpool:runfn(callback, function(thread, fn)
+        self:push_signal({
+            target_thread = thread,
+            threadpool_callback = fn,
+        }, source_thread, index)
+    end)
+end
+
+local function insert_timed_event(t, event)
+    local index = timed_events_find_next_slot(t, event)
+    table.insert(t, index, event)
+end
+
+function scheduler:scan_timers(current_time)
+    local to_be_remove_indexs = {}
+    for i, timer in ipairs(self.timers) do
+        if timer.cancel then
+            table.insert(to_be_remove_indexs, i)
+        end
+        if timer.type == 'repeat' then
+            if current_time >= (timer.start_time + timer.epoch * timer.duration) then
+                insert_timed_event(self.timed_events, timer2event(timer))
+                timer.epoch = timer.epoch + 1
+            end
+        elseif timer.type == 'once' then
+            insert_timed_event(self.timed_events, timer2event(timer))
+            table.insert(to_be_remove_indexs, i)
+        end
+    end
+    for _, i in ipairs(to_be_remove_indexs) do
+        table.remove(self.timers, i)
+    end
+end
+
+function scheduler:run_timed_events(current_time)
+    for i, e in ipairs(self.timed_events) do
+        if (not e.timer.cancel) and e.promised_time > current_time then
+            self:run_callback_in_threadpool(e.callback, e.timer.source_thread)
+        end
+    end
 end
 
 function scheduler:push_signal(signal, source_thread, index)
@@ -168,10 +330,13 @@ function scheduler:run_thread(thread, signal)
 end
 
 function scheduler:run_step()
+    local current_time = self.time()
     local queue = {}
     table.move(self.signal_queue, 1, #self.signal_queue, 1, queue)
     self.signal_queue = {}
     self.watchers.before_run_step(self, queue)
+    self:scan_timers(current_time)
+    self:run_timed_events(current_time)
     for i, signal in ipairs(queue) do
         self:run_thread(signal.target_thread, signal)
     end
@@ -271,4 +436,5 @@ return {
     wakeback_later = wakeback_later,
     push_signals = push_signals,
     fireline = fireline,
+    threadpool = threadpool,
 }
