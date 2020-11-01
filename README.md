@@ -8,11 +8,8 @@ Known supported version:
 [away - LuaRocks](https://luarocks.org/modules/thislight/away)
 
 ## APIs may being changed
-This library is still in early stage, which means APIs may be changed across versions.  
-Please keep an eye on change log and version number. The changes only on `-x` means no API changes, such as `0.0.3-0` and `0.0.3-1`.
-
 Current versions:
-- Developing: 0.1.0
+- Developing: 0.1.1
 - RR(Release-Ready): 0.1.0
 - Stable: None
 
