@@ -432,6 +432,41 @@ local function push_signals(signals)
     }
 end
 
+local function set_timers(timers)
+    co.yield {
+        away_call = 'set_timers',
+        timers = timers,
+    }
+end
+
+local function set_timeout(timeout, callback)
+    set_timers {
+        {
+            type = 'once',
+            delay = timeout,
+            callback = callback,
+        }
+    }
+end
+
+local function sleep(timeout)
+    local current_thread = get_current_thread()
+    set_timeout(timeout, function()
+        schedule_thread(current_thread)
+    end)
+    co.yield()
+end
+
+local function set_repeat(duration, callback)
+    set_timers {
+        {
+            type = 'repeat',
+            duration = duration,
+            callback = callback,
+        }
+    }
+end
+
 return {
     scheduler = scheduler,
     wait_signal_for = wait_signal_for,
@@ -442,4 +477,8 @@ return {
     push_signals = push_signals,
     fireline = fireline,
     threadpool = threadpool,
+    set_timers = set_timers,
+    set_timeout = set_timeout,
+    sleep = sleep,
+    set_repeat = set_repeat,
 }
