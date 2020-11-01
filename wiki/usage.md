@@ -157,7 +157,7 @@ wait_signal_like(nil, {
 ````
 
 ### Fireline
-Fireline is a small helper library to deal with watcher. It provides a callable table can call all functions in it directly.
+Fireline is a small helper library to deal with watcher. It provides a callable table can call all functions in it directly. *new in 0.1.0*
 ````lua
 local fireline = require("away").fireline
 local fl = fireline.create()
@@ -181,6 +181,35 @@ Insert `value` at the last of `fl`. It is a alias of `table.insert(fl, value)`. 
 
 #### `fireline.remove_by_value(fl, value)`
 Remove `value` from `fl`. Return a number for the original index, or nil for value not found.
+
+
+### threadpool
+Thread pool keeps a set of threads, which can run functions directly without create new thread, to save time on creating new threads. *new in 0.1.1*
+
+````lua
+local threadpool = require("away").threadpool
+````
+
+#### threadpool.new()
+Return a new `ThreadPool` object.
+
+#### threadpool.runfn(self, fn, resume)
+Run `fn` in a "waiting" executor. If there is no one executor is waiting, this function will create one.
+It will automatically run `threadpool:gc` in first.
+`resume` is used to resume the executor thread, by default it's `coroutine.resume`.
+
+#### threadpool.create_executor(self)
+Create a new executor and store it in `self`. Return executor descriptor (a table).
+
+Executors have three states:
+- `waiting` for executors are not running any function
+- `scheduled` for executors are set to run function
+- `running` for executors are in function's run
+Tips: the executors' state is not the state of if a thread running, it keeps for threadpool to know which executor can run function.
+
+#### threadpool.gc(self, waiting_limit)
+Remove waiting executors until the number is less than or equal `waiting_limit`.
+
 
 ### Debugger
 Debugger contains some helpers to help debugging.
