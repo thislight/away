@@ -109,7 +109,10 @@ function threadpool:first_waiting_executor()
 end
 
 function threadpool:gc(waiting_limit)
-    waiting_limit = waiting_limit or 4
+    waiting_limit = waiting_limit or 6
+    if waiting_limit > #self then
+        return
+    end
     local to_be_remove_indexs = {}
     for i,v in ipairs(self) do
         if v.state == 'waiting' then
