@@ -147,4 +147,26 @@ describe("timer", function()
         scheduler:run()
         assert.is.True(reach)
     end))
+
+    it("sleep() can let a thread sleep a while", debugger:wrapenv(function(scheduler, debugger)
+        debugger:set_timeout(scheduler, 3)
+        local reach = false
+        local time = 0 -- Warning: It's DANGEROUS to use such a trick to control time for scheduler, DO NOT change the value it twice.
+        -- If you want to change it twice or more, using real world time instead manually controlled will be less confusion
+        scheduler.time = function()
+            return time
+        end
+        scheduler:run_task(function()
+            scheduler:run_task(function()
+                assert.is.False(reach)
+                time = 5000
+            end)
+        end)
+        scheduler:run_task(function()
+            away.sleep(3000)
+            reach = true
+        end)
+        scheduler:run()
+        assert.is.True(reach)
+    end))
 end)
