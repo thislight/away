@@ -313,6 +313,9 @@ local function handle_away_call(scheduler, thread, signal)
         for _, v in ipairs(timers) do
             scheduler:set_timer(v)
         end
+        scheduler:push_signal_to_first({
+            target_thread = thread,
+        }, thread)
     end
 end
 
