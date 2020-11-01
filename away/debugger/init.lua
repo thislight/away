@@ -160,7 +160,7 @@ end
 
 function debugger:wrapenv(func)
     return function()
-        debugger:new_environment(func)()
+        debugger:new_environment(func)
     end
 end
 
