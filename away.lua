@@ -175,6 +175,12 @@ function scheduler:clone_to(new_t)
     return new_t
 end
 
+function scheduler.new()
+    local newobj = {}
+    scheduler:clone_to(newobj)
+    return newobj
+end
+
 local function timed_events_find_next_slot(t, event)
     for index, ev in ipairs(t) do
         if ev.promised_time < event.promised_time then
