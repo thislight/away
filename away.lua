@@ -261,10 +261,15 @@ function scheduler:scan_timers(current_time)
 end
 
 function scheduler:run_timed_events(current_time)
+    local to_be_removed_indexs = {}
     for i, e in ipairs(self.timed_events) do
-        if (not e.timer.cancel) and e.promised_time > current_time then
+        if (not e.timer.cancel) and current_time >= e.promised_time then
             self:run_callback_in_threadpool(e.callback, e.timer.source_thread)
+            table.insert(to_be_removed_indexs, i)
         end
+    end
+    for _, i in ipairs(to_be_removed_indexs) do
+        table.remove(self.timed_events, i)
     end
 end
 
@@ -368,8 +373,12 @@ function scheduler:run_step()
     end
 end
 
+function scheduler:has_anything_can_do()
+    return (#self.signal_queue > 0) or (#self.timed_events > 0) or (#self.timers > 0)
+end
+
 function scheduler:run()
-    while #self.signal_queue > 0 and (not self.stop_flag) do self:run_step() end
+    while self:has_anything_can_do() and (not self.stop_flag) do self:run_step() end
 end
 
 function scheduler:runforever() while not self.stop_flag do self:run_step() end end
@@ -378,7 +387,9 @@ function scheduler:stop() self.stop_flag = true end
 
 function scheduler:cleanup()
     self.signal_queue = {}
-    self.auto_signals ={}
+    self.auto_signals = {}
+    self.timers = {}
+    self.timed_events = {}
     self.current_thread = nil
     self.stop_flag = false
 end
