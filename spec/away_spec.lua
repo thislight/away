@@ -117,3 +117,34 @@ describe("wakeback_later()", function()
         end)
     end)
 end)
+
+describe("timer", function()
+    local away = require "away"
+    local debugger = require "away.debugger"
+
+    it("set_timer() can set timers", debugger:wrapenv(function(scheduler, debugger)
+        debugger:set_timeout(scheduler, 3)
+        local time = 10
+        local reach = false
+        scheduler.time = function() return time end
+        scheduler:run_task(function()
+            away.set_timers {
+                {
+                    type = 'once',
+                    delay = 1000,
+                    callback = function() time = 4000 end,
+                },
+                {
+                    type = 'once',
+                    delay = 3000,
+                    callback = function() reach = true end,
+                }
+            }
+        end)
+        scheduler:run_task(function()
+            time = 1500
+        end)
+        scheduler:run()
+        assert.is.True(reach)
+    end))
+end)
