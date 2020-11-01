@@ -69,21 +69,26 @@ end
 local threadpool = {}
 
 local function threadpool_body(descriptor)
+    local fn
     while true do
         descriptor.state = 'waiting'
-        local fn = co.yield()
+        if not fn then
+            fn = co.yield()
+        end
         if type(fn) == 'table' then
             fn = fn.threadpool_callback
         end
         if type(fn) == 'function' then
             descriptor.state = 'running'
-            fn()
+            local run = fn
+            fn = nil
+            fn = co.yield(run())
         end
     end
 end
 
 function threadpool.new()
-    return setmetatable({}, { __index = threadpool })
+    return table_deep_copy(threadpool, {})
 end
 
 function threadpool:create_executor()
@@ -373,10 +378,7 @@ function scheduler:cleanup()
 end
 
 function scheduler:run_task(taskf)
-    local th = co.create(taskf)
-    self:push_signal {
-        target_thread = th
-    }
+    self:run_callback_in_threadpool(taskf)
 end
 
 function scheduler:add_watcher(name, watcher)
