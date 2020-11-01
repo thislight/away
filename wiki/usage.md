@@ -88,6 +88,7 @@ Away call help program reach some scheduler's features without reaching the sche
 - current_thread *new in 0.0.2*
 - schedule_thread *new in 0.0.3*
 - push_signals *new in 0.0.5*
+- set_timers *new in 0.1.1*
 
 ###### `current_thread`
 Resume the calling thread as soon as possible by a signal contains itself (`.current_thread`).
@@ -98,6 +99,9 @@ Push a empty signal which run the thread given (the signal `.target_thread`). Re
 
 ###### `push_signals`
 Push signals from the signal `.signals`, wakeback thread as soon as possible.
+
+###### `set_timers`
+Set timers from the signal `.timers`. See `:set_timer(timer)` for the details of timer.
 
 
 #### `scheduler.run(self)`
@@ -111,6 +115,8 @@ Clean up data store in scheduler to get ready for next clean run.
 
 #### `scheduler.run_step(self)`
 Run one step of scheduler loop.
+
+- Now it will run timers and timed_events before run signals. *new in 0.1.1*
 
 #### `scheduler.stop(self)`
 Mark the scheduler stop.
