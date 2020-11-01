@@ -214,7 +214,7 @@ Executors have three states:
 Tips: the executors' state is not the state of if a thread running, it keeps for threadpool to know which executor can run function.
 
 #### threadpool.gc(self, waiting_limit)
-Remove waiting executors until the number is less than or equal `waiting_limit`.
+Remove waiting executors until the number is less than or equal `waiting_limit`, by default it's 6.
 
 
 ### Debugger
