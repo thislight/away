@@ -335,6 +335,11 @@ local function handle_away_call(scheduler, thread, signal)
         scheduler:push_signal_to_first({
             target_thread = thread,
         }, thread)
+    elseif call == 'schedule_task' then
+        scheduler:run_callback_in_threadpool(signal.task, signal.source_thread)
+        scheduler:push_signal_to_first({
+            target_thread = thread,
+        }, thread)
     end
 end
 
@@ -492,6 +497,13 @@ local function set_repeat(duration, callback)
     }
 end
 
+local function schedule_task(fn)
+    co.yield {
+        task = fn,
+        away_call = "schedule_task"
+    }
+end
+
 return {
     scheduler = scheduler,
     wait_signal_for = wait_signal_for,
@@ -506,4 +518,5 @@ return {
     set_timeout = set_timeout,
     sleep = sleep,
     set_repeat = set_repeat,
+    schedule_task = schedule_task,
 }
