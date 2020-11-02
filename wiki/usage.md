@@ -267,7 +267,7 @@ Remove `value` from `fl`. Return a number for the original index, or nil for val
 
 
 ### threadpool
-Thread pool keeps a set of threads, which can run functions directly without create new thread, to save time on creating new threads. *new in 0.1.1*
+Thread pool keeps a set of threads, which can run functions directly, to save time on creating new threads. *new in 0.1.1*
 
 ````lua
 local threadpool = require("away").threadpool
@@ -288,6 +288,7 @@ Executors have three states:
 - `waiting` for executors are not running any function
 - `scheduled` for executors are set to run function
 - `running` for executors are in function's run
+
 Tips: the executors' state is not the state of if a thread running, it keeps for threadpool to know which executor can run function.
 
 #### threadpool.gc(self, waiting_limit)
