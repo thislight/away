@@ -152,11 +152,11 @@ Mark the scheduler stop.
 #### `scheduler.run_task(self, taskf)`
 Create a thread using `taskf` and schedule the run.
 
-#### `scheduler.add_watcher(self, name, watcher)`
-Set a `watcher` for `name`. Return `watcher`.
-
 #### `scheduler.run_callback_in_threadpool(self, callback)`
 Run `callback` in built-in thread pool.
+
+#### `scheduler.add_watcher(self, name, watcher)`
+Set a `watcher` for `name`. Return `watcher`.
 
 ##### Watchers
 - run_thread(scheduler, thread, signal)
