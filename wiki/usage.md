@@ -89,6 +89,7 @@ Away call help program reach some scheduler's features without reaching the sche
 - schedule_thread *new in 0.0.3*
 - push_signals *new in 0.0.5*
 - set_timers *new in 0.1.1*
+- schedule_task *new in 0.1.1*
 
 ###### `current_thread`
 Resume the calling thread as soon as possible by a signal contains itself (`.current_thread`).
@@ -102,6 +103,9 @@ Push signals from the signal `.signals`, wakeback thread as soon as possible.
 
 ###### `set_timers`
 Set timers from the signal `.timers`. See `:set_timer(timer)` for the details of timer.
+
+###### `schedule_task`
+Run function from the signal `.task` in thread pool. Note that if there is no free executor, a new one will be created.
 
 
 #### `scheduler.set_timer(self, options)`
@@ -162,7 +166,7 @@ Run `callback` in built-in thread pool.
 
 
 ### Helpers
-These helpers are in `away` namespace, most of them are away calls' shortcuts.
+These helpers are in `away` namespace, most of them are away calls' shortcuts. Away calls require the thread is run by scheduler.
 
 ````lua
 local away = require "away"
@@ -231,6 +235,9 @@ Make current thread sleep `time`ms. *new in 0.1.1*
 
 #### `set_repeat(duration, fn)`
 Run `fn` every `duration`ms. *new in 0.1.1*
+
+#### `schedule_task(fn)`
+Schedule `fn` to be run in thread pool. *new in 0.1.1*
 
 ### Fireline
 Fireline is a small helper library to deal with watcher. It provides a callable table can call all functions in it directly. *new in 0.1.0*
