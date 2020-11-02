@@ -128,7 +128,7 @@ scheduler:set_timer {
 scheduler:set_timer {
     type = 'repeat',
     delay = 1000,
-    callback = function print("Hello World") end,
+    callback = function() print("Hello World") end,
 }
 ````
 
