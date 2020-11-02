@@ -64,7 +64,7 @@ Pop a signal from signal queue. Generally do not use this function. Currently, s
 Return the signal.
 
 #### `scheduler.install(self, installer)`
-Install a plugin. This function call `installer.install` by scheduler itself.
+Install a plugin. This function call `installer.install` with scheduler itself.
 Return the values return by the calling.
 
 #### `scheduler.set_auto_signal(self, f)`
@@ -103,6 +103,30 @@ Push signals from the signal `.signals`, wakeback thread as soon as possible.
 ###### `set_timers`
 Set timers from the signal `.timers`. See `:set_timer(timer)` for the details of timer.
 
+
+#### `scheduler.set_timer(self, options)`
+Create a timer depends on `options`. *new in 0.1.1*
+- If `options.type` is "once", the function will create a `timed_event`.
+- If `options.type` is "repeat", the function will create a `timer`.
+- Otherwise the function will throw a error
+
+##### Samples
+- Set a one-run timer with 3000ms delay
+````lua
+scheduler:set_timer {
+    type = 'once',
+    delay = 3000,
+    callback = function() print("Hello World") end,
+}
+````
+- Set a repeat timer with 1000ms duration
+````lua
+scheduler:set_timer {
+    type = 'repeat',
+    delay = 1000,
+    callback = function print("Hello World") end,
+}
+````
 
 #### `scheduler.run(self)`
 Start the scheduler loop. Return only when the signal queue is empty or stop flag set (by `.stop()`).
