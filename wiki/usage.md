@@ -127,7 +127,7 @@ scheduler:set_timer {
 ````lua
 scheduler:set_timer {
     type = 'repeat',
-    delay = 1000,
+    duration = 1000,
     callback = function() print("Hello World") end,
 }
 ````
