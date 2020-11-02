@@ -159,6 +159,16 @@ Set a `watcher` for `name`. Return `watcher`.
 
 
 ### Helpers
+These helpers are in `away` namespace, most of them are away calls' shortcuts.
+
+````lua
+local away = require "away"
+
+away.scheduler:run_task(function()
+    print(away.get_current_thread())
+end)
+````
+
 #### `get_current_thread()`
 *new in 0.0.2*  
 Away call `get_current_thread`, return the current thread is in.
@@ -185,6 +195,39 @@ wait_signal_like(nil, {
     kind = "dataqueue_wakeback"
 })
 ````
+
+#### `set_timers(timer_list)`
+Away call to `set_timers`, the tables in table `timer_list` will be set as timers. *new in 0.1.1*
+````lua
+local away = require "away"
+
+away.scheduler:run_task(function()
+    away.set_timers {
+        {
+            type = 'once',
+            delay = 1000,
+            callback = function() print("Hello 1") end,
+        },
+        {
+            type = 'once',
+            delay = 2000,
+            callback = function() print("Hello 2") end,
+        }
+    }
+end)
+````
+
+#### `set_timeout(timeout, fn)`
+Set a timer to run `fn` after `timeout`ms. *new in 0.1.1*
+````lua
+set_timeout(1000, function() print("Hello World") end)
+````
+
+#### `sleep(time)`
+Make current thread sleep `time`ms. *new in 0.1.1*
+
+#### `set_repeat(duration, fn)`
+Run `fn` every `duration`ms. *new in 0.1.1*
 
 ### Fireline
 Fireline is a small helper library to deal with watcher. It provides a callable table can call all functions in it directly. *new in 0.1.0*
