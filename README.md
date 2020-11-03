@@ -9,7 +9,7 @@ Known supported version:
 
 ## Current versions
 - Developing: 0.1.1
-- RR(Release-Ready): 0.1.0
+- RR(Release-Ready): 0.1.1
 - Stable: None
 
 ## Drivers
