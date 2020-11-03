@@ -269,6 +269,8 @@ function scheduler:run_timed_events(current_time)
         if (not e.timer.cancel) and current_time >= e.promised_time then
             self:run_callback_in_threadpool(e.callback, e.timer.source_thread)
             table.insert(to_be_removed_indexs, i)
+        else
+            break -- the self.timerd_events are always sorted by .promised_time
         end
     end
     for _, i in ipairs(to_be_removed_indexs) do
