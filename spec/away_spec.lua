@@ -182,7 +182,7 @@ describe("timer", function()
                 thread_pool:runfn(function()
                     reach = true
                 end)
-                assert.is.True(reach, "the second called function should will run")
+                assert.is.True(reach, "the second called function should be run")
             end))
         end)
     end)
