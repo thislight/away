@@ -3,6 +3,7 @@ A easy by-signal coroutine scheduler for Lua.
 
 Known supported version:
 - Lua 5.3
+- Lua 5.4
 
 ## LuaRocks Page
 [away - LuaRocks](https://luarocks.org/modules/thislight/away)
