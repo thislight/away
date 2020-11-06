@@ -151,7 +151,7 @@ describe("timer", function()
     it("sleep() can let a thread sleep a while", debugger:wrapenv(function(scheduler, debugger)
         debugger:set_timeout(scheduler, 3)
         local reach = false
-        local time = 0 -- Warning: It's DANGEROUS to use such a trick to control time for scheduler, DO NOT change the value it twice.
+        local time = 0 -- Warning: It's DANGEROUS to use such a trick to control time for scheduler, DO NOT change the value twice.
         -- If you want to change it twice or more, using real world time instead manually controlled will be less confusion
         scheduler.time = function()
             return time
