@@ -102,7 +102,7 @@ end
 
 function threadpool:first_waiting_executor()
     for i, v in ipairs(self) do
-        if v.state == 'waiting' then
+        if v.state == 'waiting' and co.status(v.thread) ~= 'dead' then
             return v
         end
     end
@@ -115,7 +115,7 @@ function threadpool:gc(waiting_limit)
     end
     local to_be_remove_indexs = {}
     for i,v in ipairs(self) do
-        if v.state == 'waiting' then
+        if (v.state == 'waiting') or (co.status(v.thread) == 'dead') then
             table.insert(to_be_remove_indexs, i)
         end
     end
@@ -130,6 +130,7 @@ function threadpool:gc(waiting_limit)
             table.remove(self, i)
         end
     end
+    return #to_be_remove_indexs
 end
 
 function threadpool:runfn(fn, resume)
