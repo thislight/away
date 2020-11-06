@@ -169,4 +169,21 @@ describe("timer", function()
         scheduler:run()
         assert.is.True(reach)
     end))
+
+    describe("threadpool", function()
+        describe("runfn()", function()
+            it("can run function when all the threads of executors exists died", debugger:wrapenv(function(scheduler, debugger)
+                local thread_pool = away.threadpool.new()
+                thread_pool.default_waiting_limit = 1
+                thread_pool:runfn(function()
+                    error("simulate thread died unexpectedly")
+                end)
+                local reach = false
+                thread_pool:runfn(function()
+                    reach = true
+                end)
+                assert.is.True(reach, "the second called function should will run")
+            end))
+        end)
+    end)
 end)
