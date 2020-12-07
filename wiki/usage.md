@@ -278,7 +278,6 @@ Return a new `ThreadPool` object.
 
 #### threadpool.runfn(self, fn, resume)
 Run `fn` in a "waiting" executor. If there is no one executor is waiting, this function will create one.
-It will automatically run `threadpool:gc` in first.
 `resume` is used to resume the executor thread, by default it's `coroutine.resume`.
 
 #### threadpool.create_executor(self)
@@ -290,9 +289,6 @@ Executors have three states:
 - `running` for executors are in function's run
 
 Tips: the executors' state is not the state of if a thread running, it keeps for threadpool to know which executor can run function.
-
-#### threadpool.gc(self, waiting_limit)
-Remove waiting executors until the number is less than or equal `waiting_limit`, by default it's 6.
 
 
 ### Debugger
