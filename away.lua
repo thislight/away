@@ -68,8 +68,10 @@ end
 
 local threadpool = {}
 
-local function threadpool_body(descriptor)
-    local fn
+local function threadpool_body(descriptor, pool)
+    local fn, pack, unpack
+    pack = table.pack
+    unpack = table.unpack
     while true do
         descriptor.state = 'waiting'
         if not fn then
@@ -82,7 +84,9 @@ local function threadpool_body(descriptor)
             descriptor.state = 'running'
             local run = fn
             fn = nil
-            fn = co.yield(run())
+            local result = pack(run())
+            table.insert(pool, descriptor)
+            fn = co.yield(unpack(result))
         end
     end
 end
@@ -95,7 +99,7 @@ function threadpool:create_executor()
     local descriptor = {}
     local new_thread = co.create(threadpool_body)
     descriptor.thread = new_thread
-    co.resume(new_thread, descriptor)
+    co.resume(new_thread, descriptor, self)
     table.insert(self, descriptor)
     return descriptor
 end
@@ -103,39 +107,13 @@ end
 function threadpool:first_waiting_executor()
     for i, v in ipairs(self) do
         if v.state == 'waiting' and co.status(v.thread) ~= 'dead' then
-            return v
+            return table.remove(self, i)
         end
     end
-end
-
-function threadpool:gc(waiting_limit)
-    waiting_limit = waiting_limit or 6
-    if waiting_limit > #self then
-        return
-    end
-    local to_be_remove_indexs = {}
-    for i,v in ipairs(self) do
-        if (v.state == 'waiting') or (co.status(v.thread) == 'dead') then
-            table.insert(to_be_remove_indexs, i)
-        end
-    end
-    if #to_be_remove_indexs > 0 then
-        if #to_be_remove_indexs < waiting_limit then
-            waiting_limit = #to_be_remove_indexs
-        end
-        for i=1, waiting_limit do
-            table.remove(to_be_remove_indexs)
-        end
-        for _, i in ipairs(to_be_remove_indexs) do
-            table.remove(self, i)
-        end
-    end
-    return #to_be_remove_indexs
 end
 
 function threadpool:runfn(fn, resume)
     resume = resume or co.resume
-    self:gc(self.default_waiting_limit)
     local waiting_executor = self:first_waiting_executor()
     if not waiting_executor then
         waiting_executor = self:create_executor()
