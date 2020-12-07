@@ -9,7 +9,7 @@ Known supported version:
 [away - LuaRocks](https://luarocks.org/modules/thislight/away)
 
 ## Current versions
-- Developing: 0.1.1
+- Developing: 0.1.2
 - RR(Release-Ready): 0.1.1
 - Stable: None
 
