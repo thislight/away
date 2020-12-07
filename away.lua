@@ -120,6 +120,7 @@ function threadpool:runfn(fn, resume)
     end
     waiting_executor.state = 'scheduled'
     resume(waiting_executor.thread, fn)
+    return waiting_executor
 end
 
 local scheduler = {
