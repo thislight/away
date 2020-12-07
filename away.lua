@@ -127,6 +127,7 @@ local scheduler = {
     auto_signals = {},
     current_thread = nil,
     stop_flag = false,
+    polls = {},
     error_handler = function(scheduler, err, thread, signal)
         if debug then
             local traceback = debug.traceback(thread, err)
@@ -249,7 +250,7 @@ function scheduler:run_timed_events(current_time)
             self:run_callback_in_threadpool(e.callback, e.timer.source_thread)
             table.insert(to_be_removed_indexs, i)
         else
-            break -- the self.timerd_events are always sorted by .promised_time
+            break -- the self.timed_events are always sorted by .promised_time
         end
     end
     for _, i in ipairs(to_be_removed_indexs) do
