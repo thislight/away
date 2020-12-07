@@ -268,6 +268,42 @@ function scheduler:push_signal(signal, source_thread, index)
     table.insert(self.signal_queue, index, signal)
 end
 
+local function next_timed_event_of(queue)
+    if #queue > 0 then
+        return queue[1]
+    else
+        return nil
+    end
+end
+
+function scheduler:smart_poll(current_time)
+    local timefn = self.time
+    current_time = current_time or timefn()
+    local next_timed_event = next_timed_event_of(self.timed_events)
+    local event_time, diff
+    if next_timed_event then
+        event_time = next_timed_event.promised_time
+        diff = event_time - current_time
+    end
+    local polls = self.polls
+    local polls_count = #polls
+    for i, poll in ipairs(polls) do
+        if polls_count ~= i then
+            poll(self, 'n', current_time, event_time, diff)
+        else
+            poll(self, 'w', current_time, event_time, diff)
+        end
+    end
+    if polls_count > 1 then -- make sure every polls have chance to have a full wait
+        local first_poll = table.remove(polls, 1)
+        table.insert(polls, first_poll)
+    end
+end
+
+function scheduler:add_poll(poll)
+    table.insert(self.polls, poll)
+end
+
 function scheduler:push_signal_to_first(signal, source_thread)
     self:push_signal(signal, source_thread, 1)
 end
@@ -361,6 +397,9 @@ function scheduler:run_step()
             self:push_signal(sig)
         end
     end
+    if #self.polls > 0 then
+        self:smart_poll(current_time)
+    end
 end
 
 function scheduler:has_anything_can_do()
@@ -380,6 +419,7 @@ function scheduler:cleanup()
     self.auto_signals = {}
     self.timers = {}
     self.timed_events = {}
+    self.polls = {}
     self.current_thread = nil
     self.stop_flag = false
 end
