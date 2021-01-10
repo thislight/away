@@ -5,8 +5,20 @@ Known supported version:
 - Lua 5.3
 - Lua 5.4
 
-## LuaRocks Page
-[away - LuaRocks](https://luarocks.org/modules/thislight/away)
+Pipeline status:
+| Branch  | Status                                                                                                                                                                                                                                         |
+|---------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| master  | [![pipeline status](https://gitlab.com/thislight/away/badges/master/pipeline.svg)](https://gitlab.com/thislight/away/-/pipelines?scope=all&ref=master)![coverage report](https://gitlab.com/thislight/away/badges/master/coverage.svg)    |
+| develop | [![pipeline status](https://gitlab.com/thislight/away/badges/develop/pipeline.svg)](https://gitlab.com/thislight/away/-/pipelines?scope=all&ref=develop)![coverage report](https://gitlab.com/thislight/away/badges/develop/coverage.svg) |
+
+
+## Install Away
+
+````
+luarocks install away
+````
+
+Or copy the files you need. Away is zero-dependency.
 
 ## Current versions
 - Developing: 0.1.2
