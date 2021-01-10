@@ -280,10 +280,12 @@ Return a new `ThreadPool` object.
 Run `fn` in a "waiting" executor. If there is no one executor is waiting, this function will create one.
 `resume` is used to resume the executor thread, by default it's `coroutine.resume`.
 
-Return executor descriptor. Note: This method returns value after one `resume`, so it could not be promised that the executor must in "running" stage if you check it after this method returned. Keep in mind that the tasks in the "thread pool" is still be run in single native thread.
+Return executor descriptor. Note: This method returns value after one `resume`, so it could not be promised that the executor must in "running" stage if you check it after this method returned. Keep in mind that your program is still running in single native thread.
 
 #### threadpool.create_executor(self)
-Create a new executor and store it in `self`. Return executor descriptor (a table).
+Create a new executor and store it in `self`.
+
+*new in 0.1.2: this method won't return the descriptor*
 
 Executors have three states:
 - `waiting` for executors are not running any function
@@ -292,6 +294,11 @@ Executors have three states:
 
 Tips: the executors' state is not the state of if a thread running, it's the state of if the thread is in one user function's stage.
 
+
+#### threadpool.remove_avaliable_executor(self)
+Return & remove the descriptor (table) of the first avaliable executor. Return `nil` when no avaliable executor.*new in 0.1.2*
+
+Note: If you use `threadpool.first_waiting_executor` before, use this method instead.
 
 ### Debugger
 Debugger contains some helpers to help debugging.
