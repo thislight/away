@@ -456,16 +456,17 @@ local function set_timers(timers)
         away_call = 'set_timers',
         timers = timers,
     }
+    return timers
 end
 
 local function set_timeout(timeout, callback)
-    set_timers {
+    return (set_timers {
         {
             type = 'once',
             delay = timeout,
             callback = callback,
         }
-    }
+    })[0]
 end
 
 local function sleep(timeout)
@@ -477,13 +478,13 @@ local function sleep(timeout)
 end
 
 local function set_repeat(duration, callback)
-    set_timers {
+    return (set_timers {
         {
             type = 'repeat',
             duration = duration,
             callback = callback,
         }
-    }
+    })[0]
 end
 
 local function schedule_task(fn)
