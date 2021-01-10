@@ -167,7 +167,7 @@ end
 function debugger:set_timeout(scheduler, timeout, errout, timeprovider)
     errout = errout or error
     timeprovider = timeprovider or os.time
-    promised_time = timeprovider() + timeout
+    local promised_time = timeprovider() + timeout
     local watchers = {
         before_run_step = scheduler:add_watcher('before_run_step', function()
             if timeprovider() >= promised_time then
