@@ -108,7 +108,7 @@ function threadpool:remove_avaliable_executor()
 end
 
 function threadpool:first_waiting_executor()
-    if warn then warn("threadpool.first_waiting_executor had been deprecated. Please use threadpool.remove_avaliable_executor instead.") end
+    if warn then warn("threadpool.first_waiting_executor was deprecated. Please use threadpool.remove_avaliable_executor instead.") end
     return self:remove_avaliable_executor()
 end
 
