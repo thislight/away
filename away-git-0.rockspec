@@ -4,8 +4,8 @@ source = {
    url = "git+https://github.com/thislight/away.git",
 }
 description = {
-   summary = "A easy by-signal coroutine scheduler for Lua.",
-   detailed = [[Away provides a easy by-signal coroutine scheduler for asynchronous programming.]],
+   summary = "Portable asynchronous framework",
+   detailed = [[This library provides a event-based coroutine scheduler.]],
    homepage = "https://github.com/thislight/away",
    license = "GPL-3"
 }
