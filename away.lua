@@ -235,11 +235,11 @@ function scheduler:scan_timers(current_time)
         end
         if timer.type == 'repeat' then
             if current_time >= (timer.start_time + timer.epoch * timer.duration) then
-                insert_timed_event(self.timed_events, timer2event(timer))
+                insert_timed_event(self.timed_events, timer2event(timer, current_time))
                 timer.epoch = timer.epoch + 1
             end
         elseif timer.type == 'once' then
-            insert_timed_event(self.timed_events, timer2event(timer))
+            insert_timed_event(self.timed_events, timer2event(timer, current_time))
             table.insert(to_be_remove_indexs, i)
         end
     end
