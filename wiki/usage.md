@@ -204,7 +204,8 @@ wait_signal_like(nil, {
 ````
 
 #### `set_timers(timer_list)`
-Away call to `set_timers`, the tables in table `timer_list` will be set as timers. *new in 0.1.1*
+Away call to `set_timers`, the tables in table `timer_list` will be set as timers. Return the list you pass in the function. *new in 0.1.1*
+*new in 0.1.2: the function will return the argument instead nothing*
 ````lua
 local away = require "away"
 
@@ -225,7 +226,8 @@ end)
 ````
 
 #### `set_timeout(timeout, fn)`
-Set a timer to run `fn` after `timeout`ms. *new in 0.1.1*
+Set a timer to run `fn` after `timeout`ms. Return the timer. *new in 0.1.1*
+*new in 0.1.2: return the timer instead nothing*
 ````lua
 set_timeout(1000, function() print("Hello World") end)
 ````
@@ -234,7 +236,8 @@ set_timeout(1000, function() print("Hello World") end)
 Make current thread sleep `time`ms. *new in 0.1.1*
 
 #### `set_repeat(duration, fn)`
-Run `fn` every `duration`ms. *new in 0.1.1*
+Run `fn` every `duration`ms. Return the timer. *new in 0.1.1*
+*new in 0.1.2: return the timer instead nothing*
 
 #### `schedule_task(fn)`
 Schedule `fn` to be run in thread pool. *new in 0.1.1*
