@@ -101,22 +101,23 @@ function threadpool:create_executor()
     descriptor.thread = new_thread
     co.resume(new_thread, descriptor, self)
     table.insert(self, descriptor)
-    return descriptor
+end
+
+function threadpool:remove_avaliable_executor()
+    return table.remove(self, 1)
 end
 
 function threadpool:first_waiting_executor()
-    for i, v in ipairs(self) do
-        if v.state == 'waiting' and co.status(v.thread) ~= 'dead' then
-            return table.remove(self, i)
-        end
-    end
+    if warn then warn("threadpool.first_waiting_executor had been deprecated. Please use threadpool.remove_avaliable_executor instead.") end
+    return self:remove_avaliable_executor()
 end
 
 function threadpool:runfn(fn, resume)
     resume = resume or co.resume
-    local waiting_executor = self:first_waiting_executor()
+    local waiting_executor = self:remove_avaliable_executor()
     if not waiting_executor then
-        waiting_executor = self:create_executor()
+        self:create_executor()
+        waiting_executor = self:remove_avaliable_executor()
     end
     waiting_executor.state = 'scheduled'
     resume(waiting_executor.thread, fn)
