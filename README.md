@@ -22,8 +22,8 @@ Or copy the files you need. Away is zero-dependency.
 
 ## Current versions
 - Developing: 0.1.2
-- RR(Release-Ready): 0.1.1
-- Stable: None
+- RR(Release-Ready): 0.1.2
+- Stable: COMING SOON
 
 ## Drivers
 Use away with any other asynchronous-programming library.
