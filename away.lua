@@ -466,7 +466,7 @@ local function set_timeout(timeout, callback)
             delay = timeout,
             callback = callback,
         }
-    })[0]
+    })[1]
 end
 
 local function sleep(timeout)
@@ -484,7 +484,7 @@ local function set_repeat(duration, callback)
             duration = duration,
             callback = callback,
         }
-    })[0]
+    })[1]
 end
 
 local function schedule_task(fn)
