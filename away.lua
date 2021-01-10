@@ -28,6 +28,12 @@ local function table_deep_copy(t1, t2)
     return t2
 end
 
+local function table_remove_by_indexes(t, indexes)
+    for i, index in ipairs(indexes) do
+        table.remove(t, index-i+1)
+    end
+end
+
 local fireline = {}
 
 function fireline.create()
@@ -243,9 +249,7 @@ function scheduler:scan_timers(current_time)
             table.insert(to_be_remove_indexs, i)
         end
     end
-    for _, i in ipairs(to_be_remove_indexs) do
-        table.remove(self.timers, i)
-    end
+    table_remove_by_indexes(self.timers, to_be_remove_indexs)
 end
 
 function scheduler:run_timed_events(current_time)
@@ -260,9 +264,7 @@ function scheduler:run_timed_events(current_time)
             break -- the self.timed_events are always sorted by .promised_time
         end
     end
-    for _, i in ipairs(to_be_removed_indexs) do
-        table.remove(self.timed_events, i)
-    end
+    table_remove_by_indexes(self.timed_events, to_be_removed_indexs)
 end
 
 function scheduler:push_signal(signal, source_thread, index)
