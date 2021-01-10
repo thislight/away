@@ -48,7 +48,7 @@ describe("scheduler", function()
                 assert.equals(thread.mock, thread2)
             end)
         end)
-        
+
         it("can handle schedule_thread", function()
             debugger:new_environment(function(scheduler, debugger)
                 debugger:set_timeout(scheduler, 10)
@@ -105,13 +105,11 @@ describe("wakeback_later()", function()
         debugger:new_environment(function(scheduler, debugger)
             debugger:set_timeout(scheduler, 10)
             local reach = false
-            local thread = mocks.thread(
-                function()
-                    away.wakeback_later()
-                    reach = true
-                end
-            )
-            scheduler:push_signal {target_thread = thread.mock}
+            local thread = mocks.thread(function()
+                away.wakeback_later()
+                reach = true
+            end)
+            scheduler:push_signal{target_thread = thread.mock}
             scheduler:run()
             assert.is.True(reach)
         end)
@@ -122,7 +120,8 @@ describe("timer", function()
     local away = require "away"
     local debugger = require "away.debugger"
 
-    it("set_timer() can set timers", debugger:wrapenv(function(scheduler, debugger)
+    it("set_timer() can set timers",
+       debugger:wrapenv(function(scheduler, debugger)
         debugger:set_timeout(scheduler, 3)
         local time = 10
         local reach = false
@@ -132,30 +131,27 @@ describe("timer", function()
                 {
                     type = 'once',
                     delay = 1000,
-                    callback = function() time = 4000 end,
+                    callback = function() time = 4000 end
                 },
                 {
                     type = 'once',
                     delay = 3000,
-                    callback = function() reach = true end,
+                    callback = function() reach = true end
                 }
             }
         end)
-        scheduler:run_task(function()
-            time = 1500
-        end)
+        scheduler:run_task(function() time = 1500 end)
         scheduler:run()
         assert.is.True(reach)
     end))
 
-    it("sleep() can let a thread sleep a while", debugger:wrapenv(function(scheduler, debugger)
+    it("sleep() can let a thread sleep a while",
+       debugger:wrapenv(function(scheduler, debugger)
         debugger:set_timeout(scheduler, 3)
         local reach = false
         local time = 0 -- Warning: It's DANGEROUS to use such a trick to control time for scheduler, DO NOT change the value twice.
         -- If you want to change it twice or more, using real world time instead manually controlled will be less confusion
-        scheduler.time = function()
-            return time
-        end
+        scheduler.time = function() return time end
         scheduler:run_task(function()
             scheduler:run_task(function()
                 assert.is.False(reach)
@@ -169,21 +165,21 @@ describe("timer", function()
         scheduler:run()
         assert.is.True(reach)
     end))
+end)
 
-    describe("threadpool", function()
-        describe("runfn()", function()
-            it("can run function when all the threads of executors exists died", debugger:wrapenv(function(scheduler, debugger)
-                local thread_pool = away.threadpool.new()
-                thread_pool.default_waiting_limit = 1
-                thread_pool:runfn(function()
-                    error("simulate thread died unexpectedly")
-                end)
-                local reach = false
-                thread_pool:runfn(function()
-                    reach = true
-                end)
-                assert.is.True(reach, "the second called function should be run")
-            end))
-        end)
+describe("threadpool", function()
+    local away = require "away"
+    local debugger = require "away.debugger"
+    describe("runfn()", function()
+        it("can run function when all the threads of executors exists died",
+           debugger:wrapenv(function(scheduler, debugger)
+            local thread_pool = away.threadpool.new()
+            thread_pool:runfn(function()
+                error("simulate thread died unexpectedly")
+            end)
+            local reach = false
+            thread_pool:runfn(function() reach = true end)
+            assert.is.True(reach, "the second called function should be run")
+        end))
     end)
 end)
