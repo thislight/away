@@ -251,8 +251,10 @@ end
 function scheduler:run_timed_events(current_time)
     local to_be_removed_indexs = {}
     for i, e in ipairs(self.timed_events) do
-        if (not e.timer.cancel) and current_time >= e.promised_time then
-            self:run_callback_in_threadpool(e.callback, e.timer.source_thread)
+        if current_time >= e.promised_time then
+            if not e.timer.cancel then
+                self:run_callback_in_threadpool(e.callback, e.timer.source_thread)
+            end
             table.insert(to_be_removed_indexs, i)
         else
             break -- the self.timed_events are always sorted by .promised_time
