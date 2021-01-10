@@ -145,6 +145,30 @@ describe("timer", function()
         assert.is.True(reach)
     end))
 
+    it("repeat timer works correctly", debugger:wrapenv(function(scheduler, debugger)
+        debugger:set_timeout(scheduler, 3)
+        local reach1 = false
+        local reach2 = false
+        local time = 0
+        scheduler.time = function() return time end
+        scheduler:run_task(function()
+            local timer
+            timer = away.set_repeat(100, function()
+                if not reach1 then
+                    reach1 = true
+                elseif not reach2 then
+                    reach2 = true
+                else
+                    timer.cancel = true
+                end
+                time = time + 100
+            end)
+            time = 101
+        end)
+        scheduler:run()
+        assert.is.True(reach1 and reach2, "the timer should be run three times")
+    end))
+
     it("sleep() can let a thread sleep a while",
        debugger:wrapenv(function(scheduler, debugger)
         debugger:set_timeout(scheduler, 3)
