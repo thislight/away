@@ -104,7 +104,11 @@ function threadpool:create_executor()
 end
 
 function threadpool:remove_avaliable_executor()
-    return table.remove(self, 1)
+    if #self > 0 then
+        return table.remove(self, 1)
+    else
+        return nil
+    end
 end
 
 function threadpool:first_waiting_executor()
