@@ -47,6 +47,9 @@ scheduler:run()
 Copy key-value pairs from `self` to `new_t`.
 Return `new_t`.
 
+#### `scheduler.new()`
+Create a new scheduler object. Return scheduler.
+
 #### `scheduler.push_signal(self, signal, source_thread, index)`
 Push `signal` into the singal queue of `self`.  
 The default `index` is the length of queue plus 1 (end of queue).*new in 0.0.2: parameter index*  
