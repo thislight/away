@@ -52,14 +52,17 @@ Create a new scheduler object. Return scheduler.
 
 #### `scheduler.push_signal(self, signal, source_thread, index)`
 Push `signal` into the singal queue of `self`.  
-The default `index` is the length of queue plus 1 (end of queue).*new in 0.0.2: parameter index*  
+The default `index` is the length of queue plus 1 (end of queue).
 If `signal.source_thread` have not set, the value willl be set as `source_thread`.  
 If `signal` doesn't have field `target_thread`, a error will be thrown.
 
 - This function will trigger watcher `push_signal(scheduler, signal, index)`. *new in 0.0.2*
 
+*new in 0.0.2: new parameter "index"*  
+
 #### `scheduler.push_signal_to_first(self, signal, source_thread)`
-*new in 0.0.2*  
+*new in 0.0.2*
+
 Equivent to `scheduler.push_signal(self, signal, source_thread, 1)`. 
 
 #### `scheduler.pop_signal(self)`
@@ -86,7 +89,9 @@ This function handling of new signal yielded follow the rules:
 If the thread fails, this function thrown a error. Threads must process all acceptable errrors by themselves.
 
 ##### Away Calls
-Away call help program reach some scheduler's features without reaching the scheduler. *new in 0.0.2*
+*new in 0.0.2*
+
+Away call help program reach some scheduler's features without reaching the scheduler. 
 
 - current_thread *new in 0.0.2*
 - schedule_thread *new in 0.0.3*
@@ -112,7 +117,9 @@ Run function from the signal `.task` in thread pool. Note that if there is no fr
 
 
 #### `scheduler.set_timer(self, options)`
-Create a timer depends on `options`. *new in 0.1.1*
+*new in 0.1.1*
+
+Create a timer depends on `options`.
 - If `options.type` is "once", the function will create a `timed_event`.
 - If `options.type` is "repeat", the function will create a `timer`.
 - Otherwise the function will throw a error
@@ -138,8 +145,12 @@ scheduler:set_timer {
 #### `scheduler.run(self)`
 Start the scheduler loop. Return only when the signal queue is empty or stop flag set (by `.stop()`).
 
+- Trigger watcher "stop" when exiting or error happening. *new in 0.1.3*
+
 #### `scheduler.runforever(self)`
-Run the scheduler loop until stop flag set (by `stop()`).
+Run the scheduler loop until stop flag being set (by `stop()`).
+
+- Trigger watcher "stop" when exiting or error happening. *new in 0.1.3*
 
 #### `scheduler.cleanup(self)`
 Clean up data store in scheduler to get ready for next clean run.
@@ -147,7 +158,7 @@ Clean up data store in scheduler to get ready for next clean run.
 #### `scheduler.run_step(self)`
 Run one step of scheduler loop.
 
-- Now it will run timers and timed_events before run signals. *new in 0.1.1*
+- It will run timers and timed_events before run signals. *new in 0.1.1*
 
 #### `scheduler.stop(self)`
 Mark the scheduler stop.
@@ -166,7 +177,7 @@ Set a `watcher` for `name`. Return `watcher`.
 - push_signal(scheduler, signal, index)
 - before_run_step(scheduler, signal_queue)
 - set_auto_signal(scheduler, autosig_gen, first_signal)
-- stop(scheduler)
+- stop(scheduler) *new in 0.1.3*
 
 
 #### `scheduler.set_poll(self, poller)`
@@ -202,15 +213,18 @@ end)
 
 #### `get_current_thread()`
 *new in 0.0.2*  
+
 Away call `get_current_thread`, return the current thread is in.
 
 #### `schedule_thread(thread, mixsignal)`
 *new in 0.0.3*  
+
 Away call to schedule the run of `thread` as `schedule_thread`.
 - If `mixsignal` is not `nil` or `false`, it will be sent to the thread as the signal (See section "Away Calls"). *new in 0.0.5*
 
 #### `push_signals(t)`
 *new in 0.0.5*  
+
 Away call to push any signals to signal queue as `push_signals`.
 
 #### `wait_signal_for(sig, matchfunc)`
@@ -228,8 +242,10 @@ wait_signal_like(nil, {
 ````
 
 #### `set_timers(timer_list)`
-Away call to `set_timers`, the tables in table `timer_list` will be set as timers. Return the list you pass in the function. *new in 0.1.1*
-*new in 0.1.2: the function will return the argument instead nothing*
+*new in 0.1.1*
+
+Away call to `set_timers`, the tables in table `timer_list` will be set as timers. Return the list you pass in the function. 
+
 ````lua
 local away = require "away"
 
@@ -249,25 +265,39 @@ away.scheduler:run_task(function()
 end)
 ````
 
+*new in 0.1.2: the function will return the argument instead nothing*
 #### `set_timeout(timeout, fn)`
-Set a timer to run `fn` after `timeout`ms. Return the timer. *new in 0.1.1*
-*new in 0.1.2: return the timer instead nothing*
+*new in 0.1.1*
+
+Set a timer to run `fn` after `timeout`ms. Return the timer.
+
 ````lua
 set_timeout(1000, function() print("Hello World") end)
 ````
 
+*new in 0.1.2: return the timer instead nothing*
+
 #### `sleep(time)`
-Make current thread sleep `time`ms. *new in 0.1.1*
+*new in 0.1.1*
+
+Make current thread sleep `time`ms.
 
 #### `set_repeat(duration, fn)`
-Run `fn` every `duration`ms. Return the timer. *new in 0.1.1*
+*new in 0.1.1*
+
+Run `fn` every `duration`ms. Return the timer. 
+
 *new in 0.1.2: return the timer instead nothing*
 
 #### `schedule_task(fn)`
-Schedule `fn` to be run in thread pool. *new in 0.1.1*
+*new in 0.1.1*
+
+Schedule `fn` to be run in thread pool.
 
 ### Fireline
-Fireline is a small helper library to deal with watcher. It provides a callable table can call all functions in it directly. *new in 0.1.0*
+*new in 0.1.0*
+
+Fireline is a small helper library to deal with watcher. It provides a callable table can call all functions in it directly.
 ````lua
 local fireline = require("away").fireline
 local fl = fireline.create()
@@ -294,7 +324,9 @@ Remove `value` from `fl`. Return a number for the original index, or nil for val
 
 
 ### threadpool
-Thread pool keeps a set of threads, which can run functions directly, to save time on creating new threads. *new in 0.1.1*
+*new in 0.1.1*
+
+Thread pool keeps a set of threads, which can run functions directly, to save time on creating new threads.
 
 ````lua
 local threadpool = require("away").threadpool
@@ -312,8 +344,6 @@ Return executor descriptor. Note: This method returns value after one `resume`, 
 #### threadpool.create_executor(self)
 Create a new executor and store it in `self`.
 
-*new in 0.1.2: this method won't return the descriptor*
-
 Executors have three states:
 - `waiting` for executors are not running any function
 - `scheduled` for executors are set to run function
@@ -321,9 +351,12 @@ Executors have three states:
 
 Tips: the executors' state is not the state of if a thread running, it's the state of if the thread is in one user function's stage.
 
+*new in 0.1.2: this method won't return the descriptor*
 
 #### threadpool.remove_avaliable_executor(self)
-Return & remove the descriptor (table) of the first avaliable executor. Return `nil` when no avaliable executor.*new in 0.1.2*
+*new in 0.1.2*
+
+Return & remove the descriptor (table) of the first avaliable executor. Return `nil` when no avaliable executor.
 
 Note: If you use `threadpool.first_waiting_executor` before, use this method instead.
 
