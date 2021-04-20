@@ -1,4 +1,4 @@
-# Contribution Guide
+# Contributing Guide
 
 ## Step by Step
 1. Fork. Make a your own copy.
