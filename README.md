@@ -21,7 +21,7 @@ luarocks install away
 Or copy the files you need. Away is zero-dependency.
 
 ## Current versions
-- Developing: 0.1.2
+- Developing: 0.1.3
 - RR(Release-Ready): 0.1.2
 - Stable: COMING SOON
 
