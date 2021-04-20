@@ -169,6 +169,26 @@ Set a `watcher` for `name`. Return `watcher`.
 - stop(scheduler)
 
 
+#### `scheduler.set_poll(self, poller)`
+*since 0.1.3*
+
+The the only poller of scheduler. If one poller already set, throw an error.
+
+````lua
+-- a sample poller
+local function poller(next_event_duration)
+    sth.wait_for_duration(next_event_duration)
+end
+````
+
+#### `scheduler.poll(self, current_time)`
+*since 0.1.3*
+
+Call poller once.
+
+This function will automatically called in scheduler running, after auto signals.
+
+
 ### Helpers
 These helpers are in `away` namespace, most of them are away calls' shortcuts. Away calls require the thread is run by scheduler.
 

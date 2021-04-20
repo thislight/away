@@ -160,6 +160,7 @@ local scheduler = {
         return os.time() * 1000
     end,
     threadpool = threadpool.new(),
+    poller = nil,
 }
 
 function scheduler:clone_to(new_t)
@@ -352,6 +353,24 @@ function scheduler:run_thread(thread, signal)
     self.current_thread = nil
 end
 
+function scheduler:set_poller(poller)
+    if self.poller then
+        error("away scheduler only accept one poller")
+    end
+    self.poller = poller
+end
+
+function scheduler:poll(current_time)
+    local next_event_duration
+    if #self.timed_events > 0 then
+        local next_event_time = self.timed_events[1].promised_time
+        next_event_duration = next_event_time - current_time
+    else
+        next_event_duration = -1
+    end
+    self.poller(next_event_duration)
+end
+
 function scheduler:run_step()
     local current_time = self.time()
     local queue = {}
@@ -370,6 +389,9 @@ function scheduler:run_step()
             self:push_signal(sig)
         end
     end
+    if self.poller then
+        self:poll(current_time)
+    end
 end
 
 function scheduler:has_anything_can_do()
@@ -386,8 +408,8 @@ end
 
 function scheduler:run()
     local function run_scheduler()
-    while self:has_anything_can_do() and (not self.stop_flag) do self:run_step() end
-end
+        while self:has_anything_can_do() and (not self.stop_flag) do self:run_step() end
+    end
 
     run_watchers_when_exit_or_error(self.watchers.stop, run_scheduler, self)
 end
