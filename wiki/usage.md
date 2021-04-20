@@ -166,6 +166,7 @@ Set a `watcher` for `name`. Return `watcher`.
 - push_signal(scheduler, signal, index)
 - before_run_step(scheduler, signal_queue)
 - set_auto_signal(scheduler, autosig_gen, first_signal)
+- stop(scheduler)
 
 
 ### Helpers

@@ -152,6 +152,7 @@ local scheduler = {
         push_signal = fireline.create(),-- function(scheduler, signal, index) end
         before_run_step = fireline.create(),-- function(scheduler, signal_queue) end
         set_auto_signal = fireline.create(),-- function(scheduler, autosig_gen, first_signal) end
+        stop = fireline.create(), -- function(scheduler) end
     },
     timed_events = {},
     timers = {},
@@ -375,11 +376,29 @@ function scheduler:has_anything_can_do()
     return (#self.signal_queue > 0) or (#self.timed_events > 0) or (#self.timers > 0)
 end
 
+local function run_watchers_when_exit_or_error(fl, f, ...)
+    local stat, errmsg = pcall(f)
+    fl(...)
+    if not stat then
+        error(errmsg, 0)
+    end
+end
+
 function scheduler:run()
+    local function run_scheduler()
     while self:has_anything_can_do() and (not self.stop_flag) do self:run_step() end
 end
 
-function scheduler:runforever() while not self.stop_flag do self:run_step() end end
+    run_watchers_when_exit_or_error(self.watchers.stop, run_scheduler, self)
+end
+
+function scheduler:runforever()
+    local function run_scheduler_forever()
+        while not self.stop_flag do self:run_step() end
+    end
+    
+    run_watchers_when_exit_or_error(self.watchers.stop, run_scheduler_forever, self)
+end
 
 function scheduler:stop() self.stop_flag = true end
 
