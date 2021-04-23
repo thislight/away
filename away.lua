@@ -315,7 +315,13 @@ local function handle_away_call(scheduler, thread, signal)
         local new_signals = signal.signals
         if new_signals then
             for i, v in ipairs(new_signals) do
-                scheduler:handle_new_signal(v, thread)
+                local signal_source_thread
+                if v.source_thread then
+                    signal_source_thread = v.source_thread
+                else
+                    signal_source_thread = thread
+                end
+                scheduler:handle_new_signal(v, signal_source_thread)
             end
         end
         scheduler:push_signal_to_first({target_thread = thread}, thread)

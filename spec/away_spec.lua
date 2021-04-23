@@ -75,6 +75,39 @@ describe("scheduler", function()
                 assert.equals(thread.resume_count, 2)
             end)
         end)
+
+        describe("push_signals", function()
+            it("supports away call 'current_thread'", function()
+                debugger:new_environment(function(scheduler, debugger)
+                    debugger:set_timeout(scheduler, 10)
+                    local current_thread
+                    scheduler:run_task(function()
+                        away.push_signals({
+                            {away_call='current_thread'}
+                        })
+                        local sig = co.yield()
+                        current_thread = sig.current_thread
+                    end)
+                    scheduler:run()
+                    assert.is.True(type(current_thread) == "thread", "read thread should be thread")
+                end)
+            end)
+
+            it("respect 'source_thread' in signal", function()
+                debugger:new_environment(function(scheduler, debugger)
+                    debugger:set_timeout(scheduler, 10)
+                    local thread_wakebacked = false
+                    local wakeback_thread = co.create(function() thread_wakebacked = true end)
+                    scheduler:run_task(function()
+                        away.push_signals {
+                            {away_call='current_thread', source_thread=wakeback_thread}
+                        }
+                    end)
+                    scheduler:run()
+                    assert.is.True(thread_wakebacked, "the wakeback thread should be wakebacked")
+                end)
+            end)
+        end)
     end)
 
     it("can use auto signal", function()
