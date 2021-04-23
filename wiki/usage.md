@@ -109,6 +109,8 @@ Push a empty signal which run the thread given (the signal `.target_thread`). Re
 ###### `push_signals`
 Push signals from the signal `.signals`, wakeback thread as soon as possible.
 
+- *since 0.1.3: this away call now supports signals with away call*
+
 ###### `set_timers`
 Set timers from the signal `.timers`. See `:set_timer(timer)` for the details of timer.
 
@@ -198,6 +200,12 @@ end
 Call poller once.
 
 This function will automatically called in scheduler running, after auto signals.
+
+
+#### `scheduler.handle_new_signal(self, new_signal, source_thread)`
+*since 0.1.3*
+
+Handle `new_signal` from `source_thread`. The `new_signal` may be a away call or a normal signal.
 
 
 ### Helpers

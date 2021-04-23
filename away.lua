@@ -315,7 +315,7 @@ local function handle_away_call(scheduler, thread, signal)
         local new_signals = signal.signals
         if new_signals then
             for i, v in ipairs(new_signals) do
-                scheduler:push_signal(v)
+                scheduler:handle_new_signal(v, thread)
             end
         end
         scheduler:push_signal_to_first({target_thread = thread}, thread)
@@ -335,18 +335,22 @@ local function handle_away_call(scheduler, thread, signal)
     end
 end
 
+function scheduler:handle_new_signal(new_signal, source_thread)
+    if new_signal then
+        if new_signal.away_call then
+            handle_away_call(self, source_thread, new_signal)
+        else
+            self:push_signal(new_signal, source_thread)
+        end
+    end
+end
+
 function scheduler:run_thread(thread, signal)
     self.current_thread = thread
     self.watchers.run_thread(self, thread, signal)
     local stat, new_signal = co.resume(thread, signal)
     if stat then
-        if new_signal then
-            if new_signal.away_call then
-                handle_away_call(self, thread, new_signal)
-            else
-                self:push_signal(new_signal, thread)
-            end
-        end
+        self:handle_new_signal(new_signal, thread)
     else
         self:error_handler(new_signal, thread, signal)
     end
