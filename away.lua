@@ -130,8 +130,8 @@ function threadpool:runfn(fn, resume)
         waiting_executor = self:remove_avaliable_executor()
     end
     waiting_executor.state = 'scheduled'
-    resume(waiting_executor.thread, fn)
-    return waiting_executor
+    local results = table.pack(resume(waiting_executor.thread, fn))
+    return waiting_executor, results
 end
 
 local scheduler = {
