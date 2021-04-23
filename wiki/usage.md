@@ -339,7 +339,7 @@ Return a new `ThreadPool` object.
 Run `fn` in a "waiting" executor. If there is no one executor is waiting, this function will create one.
 `resume` is used to resume the executor thread, by default it's `coroutine.resume`.
 
-Return executor descriptor and a table of result of the first resuming. Note: This method returns value after one `resume`, so it could not be promised that the executor must in "running" stage if you check it after this method returned. Keep in mind that your program is still running in single native thread.
+Return executor descriptor and a table of result of the first resuming (the whole result from the resume function. In the default `coroutine.resume`, the first element is boolean about the running status). Note: This method returns value after one `resume`, so it could not be promised that the executor must in "running" stage if you check it after this method returned. Keep in mind that your program is still running in single native thread.
 
 - *since 0.1.3: return the result table of the first resuming*
 
