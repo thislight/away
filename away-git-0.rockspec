@@ -18,5 +18,6 @@ build = {
       away = "away.lua",
       ['away.debugger'] = "away/debugger/init.lua",
       ['away.debugger.mocks'] = "away/debugger/mocks.lua",
+      ['away.promise'] = "away/promise.lua",
    }
 }

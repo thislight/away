@@ -1,5 +1,5 @@
 # Away
-A easy by-signal coroutine scheduler for Lua.
+Portable asynchronous framework for Lua.
 
 Known supported version:
 - Lua 5.3
@@ -67,6 +67,8 @@ GNU Gerneral Public License, version 3 or later.
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 > Note on GPLv3: although you have copied code from this project, you don't need to open source if you don't convey it (see GPLv3 for definition of "convey"). This is not a legal advice.
+
+> All `.d.tl` files are licensed under MIT License, turn to https://github.com/teal-language/teal-types/blob/master/LICENSE for details
 
 ## Special Things
 
