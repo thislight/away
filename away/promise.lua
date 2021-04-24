@@ -27,14 +27,24 @@ end
 
 function promise_methods:resolve(val)
     self.fulfilled = true
+    self.fulfilled_status = 'resolved'
     self.value = val
     do_wakeback_threads(self.wakeback_threads)
 end
 
 function promise_methods:reject(err)
     self.fulfilled = false
+    self.fulfilled_status ='rejected'
     self.error = err
     do_wakeback_threads(self.wakeback_threads)
+end
+
+function promise_methods:is_resovled()
+    return self.fulfilled_status == 'resolved'
+end
+
+function promise_methods:is_rejected()
+    return self.fulfilled_status == 'rejected'
 end
 
 function promise_methods:expose()
@@ -70,6 +80,7 @@ end
 local function create(execfn)
     local new_t = {
         fulfilled = false,
+        fulfilled_status = nil,
         wakeback_threads = {},
     }
     setmetatable(new_t, {__index = promise_methods})
@@ -95,17 +106,17 @@ end
 function promise_methods:on_err(fn)
     return create(function(resolve, reject)
         self:just_wait()
-        if self.error then
+        if self:is_rejected() then
             local result = fn(self.error)
             if result ~= nil then
                 resolve(result)
             else
                 reject(self.error)
             end
-        elseif self.value then
+        elseif self:is_resovled() then
             resolve(self.value)
         else
-            error("this branch should not be reach")
+            error("this branch should not be reached")
         end
     end)
 end
@@ -153,4 +164,6 @@ return {
     on_err = promise_methods.on_err,
     all = all,
     race = race,
+    is_rejected = promise_methods.is_rejected,
+    is_resovled = promise_methods.is_resovled,
 }

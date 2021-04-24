@@ -1,9 +1,14 @@
+local enum PromiseFulfilledStatus
+    "resolved"
+    "rejected"
+end
 
 local record Promise<T>
     fulfilled: boolean
     value: nil | T
     error: nil | any
     wakeback_threads: {thread}
+    fulfilled_status: nil | PromiseFulfilledStatus
 
     resolve: function(self: Promise<T>, val: T): nil
     reject: function(self: Promise<T>, err: any): nil
@@ -12,6 +17,8 @@ local record Promise<T>
     just_wait: function(self: Promise<T>): nil
     on_value: function<R>(self: Promise<T>, fn: (function(T): R)): Promise<R>
     on_err: function<R>(self: Promise<T>, fn: (function(any): (R | nil))): Promise<R>
+    is_rejected: function(self: Promise<T>): boolean
+    is_resovled: function(self: Promise<T>): boolean
 end
 
 local record away_promise
@@ -25,6 +32,8 @@ local record away_promise
     just_wait: function<T>(self: Promise<T>): nil
     on_value: function<T,R>(self: Promise<T>, fn: (function(T): R)): Promise<R>
     on_err: function<T,R>(self: Promise<T>, fn: (function(any): (R | nil))): Promise<R>
+    is_rejected: function<T>(self: Promise<T>): boolean
+    is_resovled: function<T>(self: Promise<T>): boolean
 end
 
 return away_promise
