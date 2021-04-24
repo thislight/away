@@ -102,14 +102,14 @@ Away call help program reach some scheduler's features without reaching the sche
 ###### `current_thread`
 Resume the calling thread as soon as possible by a signal contains itself (`.current_thread`).
 
+- *since 0.1.3: the away call will instantly resume the running of calling thread*
+
 ###### `schedule_thread`
 Push a empty signal which run the thread given (the signal `.target_thread`). Resume the calling thread as soon as possible.
 - If the signal have `.mixsignal`, it will be set `target_thread` and used as the signal sent to queue. *new in 0.0.5*
 
 ###### `push_signals`
 Push signals from the signal `.signals`, wakeback thread as soon as possible.
-
-- *since 0.1.3: this away call now supports signals with away call*
 
 ###### `set_timers`
 Set timers from the signal `.timers`. See `:set_timer(timer)` for the details of timer.

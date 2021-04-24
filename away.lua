@@ -299,10 +299,10 @@ end
 local function handle_away_call(scheduler, thread, signal)
     local call = signal.away_call
     if call == 'current_thread' then
-        scheduler:push_signal_to_first({
+        scheduler:run_thread(thread, {
             target_thread = thread,
             current_thread = thread,
-        }, thread)
+        })
     elseif call == 'schedule_thread' then
         local target_thread = signal.target_thread
         local new_thread_sig = signal.mixsignal or {}
@@ -321,7 +321,7 @@ local function handle_away_call(scheduler, thread, signal)
                 else
                     signal_source_thread = thread
                 end
-                scheduler:handle_new_signal(v, signal_source_thread)
+                scheduler:push_signal(v, signal_source_thread)
             end
         end
         scheduler:push_signal_to_first({target_thread = thread}, thread)
