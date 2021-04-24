@@ -1,4 +1,3 @@
--- This file is licensed under MIT License, see https://github.com/teal-language/teal-types/blob/master/LICENSE for details
 
 local enum threadpool_executor_state
     "waiting"
