@@ -33,7 +33,7 @@ function promise_methods:resolve(val)
 end
 
 function promise_methods:reject(err)
-    self.fulfilled = false
+    self.fulfilled = true
     self.fulfilled_status ='rejected'
     self.error = err
     do_wakeback_threads(self.wakeback_threads)
