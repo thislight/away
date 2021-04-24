@@ -144,7 +144,7 @@ function debugger:set_signal_uniqueness_checker(scheduler, errout)
             local signalq = scheduler.signal_queue
             for _, sig in ipairs(signalq) do
                 if sig == signal then
-                    errout("signal could not inserted twice or more : "..self.topstring(self:pretty_signal(sig)), 2)
+                    errout("signal could not be inserted twice or more : "..self.topstring(self:pretty_signal(sig)), 2)
                 end
             end
         end)
