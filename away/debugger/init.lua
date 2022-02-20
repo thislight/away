@@ -25,9 +25,9 @@ local function topstring(t)
     end
 end
 
-function debugger:create(t)
+function debugger.create(t)
     t = t or {}
-    for k, v in pairs(self) do
+    for k, v in pairs(debugger) do
         t[k] = v
     end
     t.recent_threads = {}
