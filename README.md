@@ -21,12 +21,11 @@ luarocks install away
 Or copy the files you need. Away is zero-dependency.
 
 ## Current versions
-- Developing: 0.1.3
-- RR(Release-Ready): 0.1.2
-- Stable: COMING SOON
+- 0.1.2 (current)
+- 0.1.3 (developing)
 
 ## Drivers
-Use away with any other asynchronous-programming library.
+Use away with any other asynchronous I/O library.
 
 - [away-luv](https://github.com/thislight/away-luv)
 
@@ -48,7 +47,7 @@ busted
 ````
 
 ## License
-GNU Gerneral Public License, version 3 or later.
+GNU General Public License, version 3 or later.
 
     away - a easy by-signal coroutine scheduler for Lua
     Copyright (C) 2020 thisLight <l1589002388@gmail.com>
