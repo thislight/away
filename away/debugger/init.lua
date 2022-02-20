@@ -30,7 +30,7 @@ function debugger.create(t)
     for k, v in pairs(debugger) do
         t[k] = v
     end
-    t.recent_threads = {}
+    t.recent_threads = setmetatable({}, {__mode='kv'})
     t.max_tid = 0
     return t
 end
