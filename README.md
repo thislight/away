@@ -49,8 +49,8 @@ busted
 ## License
 GNU General Public License, version 3 or later.
 
-    away - a easy by-signal coroutine scheduler for Lua
-    Copyright (C) 2020 thisLight <l1589002388@gmail.com>
+    away - Portable asynchronous framework for Lua.
+    Copyright (C) 2020-2022 thisLight <l1589002388@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
