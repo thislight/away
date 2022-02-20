@@ -1,4 +1,4 @@
--- Copyright (C) 2020 thisLight
+-- Copyright (C) 2020-2022 thisLight
 -- 
 -- This file is part of away.
 -- 

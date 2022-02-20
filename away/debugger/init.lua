@@ -1,3 +1,6 @@
+-- Copyright 2020-2022 thisLight.
+-- SPDX-License-Identifier: GPL-3.0-or-later
+
 local fireline = require("away").fireline
 local scheduler = require("away").scheduler
 
