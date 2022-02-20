@@ -126,32 +126,18 @@ local function group_by(t, key)
 end
 
 function debugger:set_target_thread_uniqueness_checker(scheduler, errout)
-    errout = errout or error
-    local watchers = {
-        before_run_step = scheduler:add_watcher('before_run_step', function(_, signalq)
-            local groups = group_by(signalq, 'target_thread')
-            for th, signals in pairs(groups) do
-                if #signals > 1 then
-                    errout(string.format("targeted thread %d (%s) is not unique in one pass of scheduler loop: %s", self:remap_thread(th), th, self.topstring(self:pretty_signal_queue(signals))), 2)
-                end
-            end
-        end)
-    }
+    if warn then
+        warn("debugger:set_target_thread_uniqueness_checker have been deprecated.")
+    end
+    local watchers = {}
     return watchers
 end
 
 function debugger:set_signal_uniqueness_checker(scheduler, errout)
-    errout = errout or error
-    local watchers = {
-        push_signal = scheduler:add_watcher('push_signal', function(scheduler, signal)
-            local signalq = scheduler.signal_queue
-            for _, sig in ipairs(signalq) do
-                if sig == signal then
-                    errout("signal could not be inserted twice or more : "..self.topstring(self:pretty_signal(sig)), 2)
-                end
-            end
-        end)
-    }
+    if warn then
+        warn("debugger:set_signal_uniqueness_checker have been deprecated.")
+    end
+    local watchers = {}
     return watchers
 end
 
