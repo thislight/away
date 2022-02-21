@@ -17,8 +17,9 @@ local record Promise<T>
     just_wait: function(self: Promise<T>): nil
     on_value: function<R>(self: Promise<T>, fn: (function(T): R)): Promise<R>
     on_err: function<R>(self: Promise<T>, fn: (function(any): (R | nil))): Promise<R>
-    is_rejected: function(self: Promise<T>): boolean
-    is_resovled: function(self: Promise<T>): boolean
+    rejectedp: function(self: Promise<T>): boolean
+    resolvedp: function(self: Promise<T>): boolean
+    flatmap: function<R>(self: Promise<T>, fn: (function(T): R)): Promise<R>
 end
 
 local record away_promise
@@ -30,10 +31,11 @@ local record away_promise
     expose: function<T>(self: Promise<T>): T
     wait: function<T>(self: Promise<T>): T
     just_wait: function<T>(self: Promise<T>): nil
-    on_value: function<T,R>(self: Promise<T>, fn: (function(T): R)): Promise<R>
-    on_err: function<T,R>(self: Promise<T>, fn: (function(any): (R | nil))): Promise<R>
-    is_rejected: function<T>(self: Promise<T>): boolean
-    is_resovled: function<T>(self: Promise<T>): boolean
+    map: function<T,R>(self: Promise<T>, fn: (function(T): R)): Promise<R>
+    maperr: function<T,R>(self: Promise<T>, fn: (function(any): (R | nil))): Promise<R>
+    rejectedp: function<T>(self: Promise<T>): boolean
+    resolvedp: function<T>(self: Promise<T>): boolean
+    flatmap: function<T, R>(self: Promise<T>, fn: (function(T): R)): Promise<R>
 end
 
 return away_promise
