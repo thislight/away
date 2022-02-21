@@ -15,8 +15,8 @@ local record Promise<T>
     expose: function(self: Promise<T>): T
     wait: function(self: Promise<T>): T
     just_wait: function(self: Promise<T>): nil
-    on_value: function<R>(self: Promise<T>, fn: (function(T): R)): Promise<R>
-    on_err: function<R>(self: Promise<T>, fn: (function(any): (R | nil))): Promise<R>
+    map: function<R>(self: Promise<T>, fn: (function(T): R)): Promise<R>
+    maperr: function<R>(self: Promise<T>, fn: (function(any): (R | nil))): Promise<R>
     rejectedp: function(self: Promise<T>): boolean
     resolvedp: function(self: Promise<T>): boolean
     flatmap: function<R>(self: Promise<T>, fn: (function(T): R)): Promise<R>
