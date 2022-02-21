@@ -1,7 +1,8 @@
 package = "away"
-version = "git-0"
+version = "0.1.3-0"
 source = {
    url = "git+https://github.com/thislight/away.git",
+   tag = "v0.1.3-0"
 }
 description = {
    summary = "Portable asynchronous framework",
