@@ -1,0 +1,5 @@
+FROM fedora:37
+
+RUN dnf update -y && dnf install -y lua luarocks gcc valgrind && rm -rf /var/cache/dnf
+COPY spec/test.sh /bin/test.sh
+ENTRYPOINT [ "test.sh" ]

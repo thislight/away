@@ -2,7 +2,6 @@
 Portable asynchronous framework for Lua.
 
 Known supported version:
-- Lua 5.3
 - Lua 5.4
 
 Pipeline status:
@@ -19,19 +18,6 @@ luarocks install away
 ````
 
 Or copy the files you need. Away is zero-dependency.
-
-## Current versions
-- 0.1.2 (current)
-- 0.1.3 (developing)
-
-## Drivers
-Use away with any other asynchronous I/O library.
-
-- [away-luv](https://github.com/thislight/away-luv)
-
-## Helpers
-
-- [away-dataqueue](https://github.com/thislight/away-dataqueue)
 
 ## Doucments
 - [Designs](wiki/designs.md)

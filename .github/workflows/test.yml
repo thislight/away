@@ -1,0 +1,10 @@
+on: push
+
+jobs:
+  test_lua54:
+    runs-on: ubuntu-22.04
+    name: Test on Lua54
+    steps:
+      - uses: actions/checkout@v3
+      - run: podman -f Containerfile.lua54 -t away-env54
+      - run: podman run --rm -v"$PWD:/mnt/code:O" --network=host away-env54 +valgrind

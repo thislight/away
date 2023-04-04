@@ -5,21 +5,16 @@ source = {
 }
 description = {
    summary = "Portable asynchronous framework",
-   detailed = [[This library provides a event-based coroutine scheduler.]],
+   detailed = [[This library provides a coroutine scheduler.]],
    homepage = "https://github.com/thislight/away",
    license = "GPL-3"
 }
 dependencies = {
-   "lua >=5.3, <=5.4"
+   "lua >=5.4,<5.5"
 }
 build = {
    type = "builtin",
    modules = {
-      away = "away.lua",
-      ['away.debugger'] = "away/debugger/init.lua",
-      ['away.debugger.mocks'] = "away/debugger/mocks.lua",
-      ['away.promise'] = "away/promise.lua",
-      ['away.hrt'] = "away/hrt.lua",
-      ['away.series'] = "away/series.lua",
+      away = "away.c",
    }
 }
