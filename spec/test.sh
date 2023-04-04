@@ -2,7 +2,7 @@
 
 cd /mnt/code || exit
 if [ "$1" = "+valgrind" ]; then
-    eval "$(luarocks path)" && luarocks install busted --deps-mode none && luarocks build --deps-mode none && valgrind --trace-children=yes --track-origins=yes --leak-check=full luarocks test
+    eval "$(luarocks path)" && luarocks install busted && luarocks build && valgrind --trace-children=yes --track-origins=yes --leak-check=full lua_modules/bin/busted
 else
-    eval "$(luarocks path)" && luarocks install busted --deps-mode none && luarocks build --deps-mode none && luarocks test
+    eval "$(luarocks path)" && luarocks install busted && luarocks build && luarocks test
 fi
