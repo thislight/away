@@ -66,4 +66,6 @@ void away_yield(lua_State *S);
 
 void away_switchto(struct away_track *track, struct away_track *target);
 
+void away_pause(struct away_track *track);
+
 LUA_API int luaopen_away(lua_State *S);
