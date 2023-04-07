@@ -1,6 +1,8 @@
 #include "away.h"
 #include <assert.h>
+#include <float.h>
 #include <lauxlib.h>
+#include <limits.h>
 #include <lua.h>
 #include <stddef.h>
 #include <stdnoreturn.h>
@@ -53,15 +55,16 @@ struct away_tracklist awayI_tracklist_empty() {
 /**
  * @brief Update track pointers in lua_States.
  * Call this function with the moved memory, or away calls will fail.
- * 
- * @param olist 
- * @param nptr 
+ *
+ * @param olist
+ * @param nptr
  */
-void awayI_tracklist_update_ptrs(struct away_tracklist *olist, struct away_track *nptr) {
-  for (size_t i=0; i < olist->len; i++) {
-        struct away_track *track = &nptr[i];
-        *awayI_get_track_store(track->S) = track;
-      }
+void awayI_tracklist_update_ptrs(struct away_tracklist *olist,
+                                 struct away_track *nptr) {
+  for (size_t i = 0; i < olist->len; i++) {
+    struct away_track *track = &nptr[i];
+    *awayI_get_track_store(track->S) = track;
+  }
 }
 
 int awayI_tracklist_expand(lua_State *S, struct away_tracklist *list,
@@ -511,6 +514,30 @@ void away_switchto(struct away_track *original, struct away_track *switchto) {
   original->switchto = switchto;
 }
 
+#define VarMaxValue(v)                                                         \
+  _Generic(v, char                                                             \
+           : CHAR_MAX, unsigned char                                           \
+           : UCHAR_MAX, signed char                                            \
+           : SCHAR_MAX, signed short                                           \
+           : SHRT_MAX, unsigned short                                          \
+           : USHRT_MAX, signed int                                             \
+           : INT_MAX, unsigned int                                             \
+           : UINT_MAX, signed long                                             \
+           : LONG_MAX, unsigned long                                           \
+           : ULONG_MAX, signed long long                                       \
+           : LLONG_MAX, unsigned long long                                     \
+           : ULLONG_MAX, float                                                 \
+           : FLT_MAX, double                                                   \
+           : DBL_MAX, long double                                              \
+           : LDBL_MAX )
+
+void away_pause(struct away_track *track) {
+  track->wake_after = (struct timespec){
+      .tv_nsec = LONG_MAX,
+      .tv_sec = VarMaxValue((time_t)0),
+  };
+}
+
 int laway_set_timer(lua_State *S) {
   lua_Integer msec = luaL_checkinteger(S, 1);
   struct timespec timeout = awayI_timespec_from_int_ms(msec);
@@ -613,6 +640,16 @@ int laway_switchto(lua_State *S) {
   return 0;
 }
 
+int laway_pause(lua_State *S) {
+  struct away_track *track = away_get_track(S);
+  if (track != NULL) {
+    away_pause(track);
+  } else {
+    luaL_error(S, "caller thread is not tracked by scheduler");
+  }
+  return 0;
+}
+
 const luaL_Reg AWAY_SCHED_METATAB[] = {
     {"__gc", awayL_sched_gc},
     {NULL, NULL},
@@ -628,6 +665,7 @@ const luaL_Reg AWAY[] = {{"sched", &laway_sched_new},
                          {"settimef", &laway_settimef},
                          {"hrt_now", &laway_hrt_now},
                          {"switchto", &laway_switchto},
+                         {"pause", &laway_pause},
                          {NULL, NULL}};
 
 LUA_API int luaopen_away(lua_State *S) {

@@ -14,6 +14,7 @@
 -- 
 -- You should have received a copy of the GNU General Public License
 -- along with away.  If not, see <http://www.gnu.org/licenses/>.
+local spy = require "luassert.spy"
 describe("away", function()
     local away = require "away"
 
@@ -83,6 +84,33 @@ describe("away", function()
             end)
             away.run(sched)
             assert.are.same({1, 3, 2}, order)
+        end)
+    end)
+
+    describe("pause()", function()
+        it("can pause the thread from next run", function()
+            local sched = away.sched()
+            local touched = false
+            away.spawn(sched, function()
+                away.pause()
+                away.yield()
+                touched = true
+            end)
+            away.spawn(sched, function() away.stop(sched) end)
+            away.run(sched)
+            assert.is_False(touched)
+        end)
+
+        it("does not pause the thread immediately", function()
+            local sched = away.sched()
+            local touched = false
+            away.spawn(sched, function()
+                away.pause()
+                touched = true
+            end)
+            away.spawn(sched, function() away.stop(sched) end)
+            away.run(sched)
+            assert.is_True(touched)
         end)
     end)
 end)
