@@ -3,10 +3,8 @@
 #include <float.h>
 #include <lauxlib.h>
 #include <limits.h>
-#include <lua.h>
-#include <stddef.h>
+#include <lauxlib.h>
 #include <stdnoreturn.h>
-#include <time.h>
 
 static_assert(LUA_EXTRASPACE >= sizeof(struct away_track *),
               "LUA_EXTRASPACE must able to store a pointer");

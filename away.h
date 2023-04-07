@@ -1,8 +1,5 @@
-#include <lauxlib.h>
 #include <lua.h>
 #include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
 #include <time.h>
 
 struct away_poll_deadline {
