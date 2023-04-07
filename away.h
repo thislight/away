@@ -3,7 +3,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <threads.h>
 #include <time.h>
 
 struct away_poll_deadline {
