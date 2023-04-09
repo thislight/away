@@ -16,5 +16,6 @@ build = {
    type = "builtin",
    modules = {
       away = "away.c",
+      ["away.promise"] = {"away.c", "away/promise.c"},
    }
 }
