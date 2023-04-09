@@ -113,4 +113,18 @@ describe("away", function()
             assert.is_True(touched)
         end)
     end)
+
+    describe("current()", function ()
+        it("returns current thread in tracked thread", function ()
+            local sched = away.sched()
+            local touched = false
+            away.spawn(sched, function ()
+                assert.is_thread(away.current())
+                touched = true
+                away.stop(sched)
+            end)
+            away.run(sched)
+            assert.is_True(touched)
+        end)
+    end)
 end)

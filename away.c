@@ -648,6 +648,16 @@ int laway_pause(lua_State *S) {
   return 0;
 }
 
+int laway_current(lua_State *S) {
+  struct away_track *track = away_get_track(S);
+  if (track != NULL) {
+    lua_pushthread(S);
+  } else {
+    luaL_error(S, "caller thread is not tracked by scheduler");
+  }
+  return 1;
+}
+
 const luaL_Reg AWAY_SCHED_METATAB[] = {
     {"__gc", awayL_sched_gc},
     {NULL, NULL},
@@ -664,6 +674,7 @@ const luaL_Reg AWAY[] = {{"sched", &laway_sched_new},
                          {"hrt_now", &laway_hrt_now},
                          {"switchto", &laway_switchto},
                          {"pause", &laway_pause},
+                         {"current", &laway_current},
                          {NULL, NULL}};
 
 LUA_API int luaopen_away(lua_State *S) {
