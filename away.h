@@ -14,6 +14,7 @@ struct away_track {
   struct timespec wake_after;
   struct away_track *switchto;
   int lref;
+  int lcxref;
 };
 
 struct away_tracklist {
@@ -35,7 +36,8 @@ struct away_sched {
   away_Time timef;
   void *time_ud;
   struct timespec current_time;
-  lua_Integer lregref;
+  int lregref;
+  int lcxrootref;
 };
 
 LUA_API struct away_sched *away_sched_new(lua_State *S, int nreg,

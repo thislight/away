@@ -4,6 +4,7 @@
 #include <lauxlib.h>
 #include <limits.h>
 #include <lauxlib.h>
+#include <lua.h>
 #include <stdnoreturn.h>
 
 static_assert(LUA_EXTRASPACE >= sizeof(struct away_track *),
@@ -202,7 +203,12 @@ LUA_API struct away_sched *away_sched_new(lua_State *S, int nreg,
       .time_ud = timef_ud,
       .current_time = {0, 0},
       .lregref = regref,
+      .lcxrootref = 0,
   };
+  int awayI_sched_ref(lua_State *S, struct away_sched *sched);
+  lua_newtable(S);
+  int cxrootref = awayI_sched_ref(S, sched);
+  sched->lcxrootref = cxrootref;
   return sched;
 }
 
@@ -280,6 +286,7 @@ LUA_API lua_State *away_spawn_thread(lua_State *S, struct away_sched *sched) {
                                    .tv_nsec = 0,
                                }),
                                .switchto = NULL,
+                               .lcxref = 0,
                            });
   if (slot != NULL) {
     struct away_track **store = awayI_get_track_store(th);
@@ -303,6 +310,9 @@ const struct timespec *awayI_sched_update_time(lua_State *S,
 void awayI_sched_untracki(lua_State *S, struct away_sched *sched, size_t i) {
   if (sched->tracks.len > i) {
     struct away_track *track = &sched->tracks.items[i];
+    if (track->lcxref != 0) {
+      awayI_sched_unref(S, sched, track->lcxref);
+    }
     awayI_sched_unref(S, sched, track->lref);
     awayI_tracklist_swaprmi(&sched->tracks, i);
   }
@@ -536,6 +546,39 @@ void away_pause(struct away_track *track) {
   };
 }
 
+void away_copycx(struct away_track *src, struct away_track *dst) {
+  lua_newtable(dst->S);
+  int newcx_idx = lua_gettop(dst->S);
+  if (src != NULL) {
+    awayI_sched_pushreg(src->S, src->sched);
+    lua_rawgeti(src->S, -1, src->lcxref);
+    lua_xmove(src->S, dst->S, 1);
+    lua_pop(src->S, 1);
+  } else {
+    awayI_sched_pushreg(dst->S, dst->sched);
+    lua_rawgeti(dst->S, -1, dst->sched->lcxrootref);
+    lua_insert(dst->S, -2);
+    lua_pop(dst->S, 1);
+  }
+  lua_createtable(dst->S, 0, 1);
+  lua_insert(dst->S, -2);
+  lua_setfield(dst->S, -2, "__index");
+  lua_setmetatable(dst->S, newcx_idx);
+  lua_pushvalue(dst->S, newcx_idx);
+  dst->lcxref = awayI_sched_ref(dst->S, dst->sched);
+}
+
+void away_context(struct away_track *track) {
+  if (track->lcxref != 0) {
+    awayI_sched_pushreg(track->S, track->sched);
+    lua_rawgeti(track->S, -1, track->lcxref);
+    lua_insert(track->S, -2);
+    lua_pop(track->S, 1);
+  } else {
+    lua_pushnil(track->S);
+  }
+}
+
 int laway_set_timer(lua_State *S) {
   lua_Integer msec = luaL_checkinteger(S, 1);
   struct timespec timeout = awayI_timespec_from_int_ms(msec);
@@ -549,11 +592,13 @@ int laway_set_timer(lua_State *S) {
 
 int laway_spawn_thread(lua_State *S) {
   struct away_sched *sched = lua_isnil(S, 1) ? NULL : luaL_checkudata(S, 1, AWAY_SCHED_TAG);
+  struct away_track *cx_src = NULL;
   luaL_checktype(S, 2, LUA_TFUNCTION);
   if (sched == NULL) {
     struct away_track *track = away_get_track(S);
     if (track != NULL) {
       sched = track->sched;
+      cx_src = track;
     } else {
       luaL_error(S, "caller thread is not tracked by scheduler");
     }
@@ -567,6 +612,8 @@ int laway_spawn_thread(lua_State *S) {
   } else {
     lua_pushnil(S);
   }
+  away_copycx(cx_src, away_get_track(th));
+  lua_pop(th, 1);
   return 1;
 }
 
@@ -666,6 +713,25 @@ int laway_current(lua_State *S) {
   return 1;
 }
 
+int laway_context(lua_State *S) {
+  struct away_track *track = away_get_track(S);
+  if (track != NULL) {
+    away_context(track);
+    return 1;
+  } else {
+    luaL_error(S, "caller thread is not tracked by scheduler");
+  }
+}
+
+int laway_rootcontext(lua_State *S) {
+  struct away_sched *sched = luaL_checkudata(S, 1, AWAY_SCHED_TAG);
+  awayI_sched_pushreg(S, sched);
+  lua_rawgeti(S, -1, sched->lcxrootref);
+  lua_insert(S, -2);
+  lua_pop(S, 1);
+  return 1;
+}
+
 const luaL_Reg AWAY_SCHED_METATAB[] = {
     {"__gc", awayL_sched_gc},
     {NULL, NULL},
@@ -683,6 +749,8 @@ const luaL_Reg AWAY[] = {{"sched", &laway_sched_new},
                          {"switchto", &laway_switchto},
                          {"pause", &laway_pause},
                          {"current", &laway_current},
+                         {"context", &laway_context},
+                         {"root_context", &laway_rootcontext},
                          {NULL, NULL}};
 
 LUA_API int luaopen_away(lua_State *S) {
