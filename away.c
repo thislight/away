@@ -549,7 +549,7 @@ void away_pause(struct away_track *track) {
 void away_copycx(struct away_track *src, struct away_track *dst) {
   lua_newtable(dst->S);
   int newcx_idx = lua_gettop(dst->S);
-  if (src != NULL) {
+  if (src != NULL && src->lcxref != 0) {
     awayI_sched_pushreg(src->S, src->sched);
     lua_rawgeti(src->S, -1, src->lcxref);
     lua_xmove(src->S, dst->S, 1);
