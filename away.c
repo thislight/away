@@ -548,8 +548,16 @@ int laway_set_timer(lua_State *S) {
 }
 
 int laway_spawn_thread(lua_State *S) {
-  struct away_sched *sched = luaL_checkudata(S, 1, AWAY_SCHED_TAG);
+  struct away_sched *sched = lua_isnil(S, 1) ? NULL : luaL_checkudata(S, 1, AWAY_SCHED_TAG);
   luaL_checktype(S, 2, LUA_TFUNCTION);
+  if (sched == NULL) {
+    struct away_track *track = away_get_track(S);
+    if (track != NULL) {
+      sched = track->sched;
+    } else {
+      luaL_error(S, "caller thread is not tracked by scheduler");
+    }
+  }
   lua_State *th = away_spawn_thread(S, sched);
   if (th != NULL) {
     lua_pushvalue(S, 2);
